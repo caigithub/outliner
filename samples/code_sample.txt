@@ -1,0 +1,165 @@
+package com.emc.navisphere.gui.plugins.siw.culham;
+
+import java.awt.Dimension;
+import java.util.List;
+
+import com.emc.core.logging.FxCoreLogManager;
+import com.emc.core.logging.IFxCoreLogger;
+import com.emc.navisphere.commapi.interfaces.INaviValue;
+import com.emc.navisphere.commapi.util.NaviScope;
+import com.emc.navisphere.commapi.util.ParamArrayList;
+import com.emc.navisphere.gui.common.utilities.NaviToolException;
+import com.emc.navisphere.gui.interfaces.INaviToolCallback;
+import com.emc.navisphere.gui.plugins.siw.PlanningWizard.CulhamBlockPlanningWizardData;
+import com.emc.navisphere.gui.plugins.siw.PlanningWizard.PlanningWizard;
+import com.emc.navisphere.gui.plugins.siw.SwInstallWizard.CulhamBlockUpgradeWizardData;
+import com.emc.navisphere.gui.plugins.siw.SwInstallWizard.SWInstallPlanningInfo;
+import com.emc.navisphere.gui.plugins.siw.SwInstallWizard.SWInstallWizard;
+import com.emc.navisphere.service.svccommon.parameterDefinitions.ICulhamBlockUpgradeTool;
+/**
+ * 
+ * <p>
+ * Class Name: CulhamBlockUpgradeToolAction
+ * </p>
+ *
+ * <p>
+ * Description: Entry point to launch the block upgrade tool. Block is a part of the Culham
+ * storage system, which is equivalent to the existing CLARiiON.
+ * 
+ * See {@link ICulhamBlockUpgradeTool} for more information on the parameter to start the block upgrade tool.
+ * </p>
+ *
+ * <p>
+ * Company: EMC Corporation
+ * </p>
+ *
+ * <p>
+ * Copyright: Copyright (c) 2011
+ * </p>
+ *
+ * @author Mingjiang Shi
+ * 
+ * @version 1.1  Changed by Qi Qu on Jun. 17, 2011
+ *  @description: Fix for AR 420440 to add warning for upgrade from Elias(R31) to Franklin(R31 patch) to configure a "system" type user.
+ */
+public class CulhamBlockUpgradeToolAction implements ICulhamBlockUpgradeTool {
+
+    // logger
+    private IFxCoreLogger _logger = FxCoreLogManager.getCoreLogger(this);
+
+    /**
+     * Start the Block Upgrade Tool
+     * @param args BlockUpgradeParameter
+     * @param callback NaviToolCallback, currently not supported for block upgrade tool
+     * 
+     * @throws NaviToolException when the tool failed to launch, the NaviToolException is thrown.
+     * Note that, the error message is not intended to be displayed for user, as those error messages
+     * are too detailed, so the error message is not localized and only for log purpose.
+     * Also, the error code will always be 0, it's not good idea to use error code identify the different errors. 
+     */
+    @Override
+        public boolean start(ParamArrayList args, INaviToolCallback callback)
+        throws NaviToolException {
+        try {
+            // get the parameter
+            INaviValue paramValue = args.getParamValueByName(BLOCK_UPGRADE_TOOL_PARAM);
+            if (paramValue == null) {
+                throw new NaviToolException(getClass().getName(), 0, "Invalid paratmeter: Null block upgrade tool param is passed in.");
+            }
+
+            // get the block subsystem
+            BlockUpgradeToolParam blockUpgradeParam = (BlockUpgradeToolParam) paramValue.getAsJavaObject();
+            NaviScope naviScope = blockUpgradeParam.naviScope;
+            if (naviScope == null || naviScope.getBaseObject() == null) {
+                throw new NaviToolException(getClass().getName(), 0, "Invalid parameter: No block subsystem scope is got from the patermeter.");
+            }
+
+            BlockUpgradeToolMode mode = blockUpgradeParam.mode;
+
+            // upgrade
+            if (mode == BlockUpgradeToolMode.UPGRADE_BLOCK_ONLY || mode == BlockUpgradeToolMode.UPGRADE_BLOCK_AFTER_FILE) {
+                boolean isFileUpgraded = (mode == BlockUpgradeToolMode.UPGRADE_BLOCK_AFTER_FILE);
+                // give the wizard data model two resource file, the 1st one is parent file, the 2nd one is the child resource file.
+                CulhamBlockUpgradeWizardData data = new CulhamBlockUpgradeWizardData(
+                        blockUpgradeParam.culhamScope.getMergedScope(), 
+                        "/wizards/siw/CulhamBlockUpgradeInterface.xml", 
+                        "SWInstallationWizard", 
+                        "CulhamBlockUpgradeInterfaceSpecific",
+                        isFileUpgraded);
+
+                // set the file upgrade info, when file and block are upgrading together, so that at the finish step after block upgrade,
+                // the file upgrade information can be shown together.
+                List<String> fileUpgradeResults = blockUpgradeParam.fileUpgradeResults;
+                if (fileUpgradeResults != null) {
+                    data.setFileUpgradeResults(fileUpgradeResults);
+                }
+
+                // set the system to the Culham system name, so that the block upgrade wizard displays the Culham storage name rather than the old block name.
+                String culhamSystemName = blockUpgradeParam.culhamSystemName;
+                data.setSysName(culhamSystemName);
+
+                // set the culham scope
+                data.setCulhamScope(blockUpgradeParam.culhamScope);
+                // start the wizard and set the preferred size.
+                final SWInstallWizard wizardDlg = new SWInstallWizard(data, naviScope);
+                data.setJNfxWizard(wizardDlg);
+
+                // set the window preferred size to a common size, so that the wizards window are the same which looks like a single wizard.
+                wizardDlg.setPreferredSize(new Dimension(CulhamUpgradeConstants.PREFERRED_WIZARD_DIALOG_WIDTH, 
+                            CulhamUpgradeConstants.PREFERRED_WIZARD_DIALOG_HEIGHT));
+
+                wizardDlg.showContainer(CulhamUpgradeConstants
+                        .getUpgradeWizardTitle(culhamSystemName));
+            } 
+            // preparation
+            else if (mode == BlockUpgradeToolMode.PREPARE_BLOCK_FILE || mode == BlockUpgradeToolMode.PREPARE_BLOCK_ONLY) {
+                CulhamBlockPlanningWizardData data = new CulhamBlockPlanningWizardData(
+                        blockUpgradeParam.culhamScope.getMergedScope(), 
+                        "/wizards/siw/CulhamBlockPlanningInterface.xml", 
+                        "CulhamBlockPlanningInterfaceSpecific");
+
+                //Get and  store the storage system information, so the planning xml file will be created initially.
+                SWInstallPlanningInfo.StorageSysInfo storageSysInfo = new SWInstallPlanningInfo.StorageSysInfo(
+                        data.getSysName(),
+                        data.getSPNetworkName(),
+                        data.getSysId(),
+                        data.getSpaIpAddress(),
+                        data.getHWModel(),
+                        data.getFlareRev()
+                        );
+                data.setPlanningStorageSysInfo(storageSysInfo);
+
+                // set if continue prepare file after the block preparation.
+                data.setConcatFilePreparation(mode == BlockUpgradeToolMode.PREPARE_BLOCK_FILE);
+                //AR 420440
+                data.setCulhamScope(blockUpgradeParam.culhamScope);
+                // set call back
+                if (callback != null) {
+                    data.setNaviToolCallback(callback);
+                }
+
+                PlanningWizard wizardDlg = new PlanningWizard(data, naviScope);
+                wizardDlg.setPreferredSize(new Dimension(CulhamUpgradeConstants.PREFERRED_WIZARD_DIALOG_WIDTH, 
+                            CulhamUpgradeConstants.PREFERRED_WIZARD_DIALOG_HEIGHT));
+                data.setWizardObject(wizardDlg);
+
+                // show the wizard
+                wizardDlg.showContainer(CulhamUpgradeConstants.getPlanningWizardTitle(blockUpgradeParam.culhamSystemName));
+            }     
+        } catch (NaviToolException nte) {
+            throw nte;
+        } catch (Exception e) {
+            _logger.exception("Exception while starting block upgrade tool.", e);
+
+            // wrap the exception as NaviToolException.
+            throw new NaviToolException(getClass().getName(), 0, e.getMessage());
+        }
+        return true;
+        }
+
+    @Override
+        public boolean stop() {
+            throw new UnsupportedOperationException("The stop operation is not supported");
+        }
+}
+

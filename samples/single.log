@@ -1,0 +1,548 @@
+
+DEBUG 2012-04-26 15:05:42,437 [com.emc.celerra.startup.wrapper.Main]: Closing File-input Stream in finally block for property file CPW_Language_Selection.properties
+ 
+DEBUG 2012-04-26 15:05:42,437 [com.emc.celerra.startup.wrapper.Main]: Current Locale is : en
+ 
+DEBUG 2012-04-26 15:05:42,500 [com.emc.celerra.startup.baseutil.i18n.MessageRetriever]: Setting the Locale : en
+ 
+INFO  2012-04-26 15:05:42,640 [com.emc.celerra.startup.wrapper.Main]: CSA version 7.1.41.2
+ 
+DEBUG 2012-04-26 15:05:47,453 [com.emc.celerra.startup.wrapper.FirstModule]: XML file(s) are present.
+ 
+DEBUG 2012-04-26 15:05:47,453 [com.emc.celerra.startup.framework.WizController]:  validation code = 2
+ 
+DEBUG 2012-04-26 15:05:47,453 [com.emc.celerra.startup.framework.WizController]: calling next() method
+ 
+DEBUG 2012-04-26 15:05:52,140 [com.emc.celerra.startup.wrapper.FirstModule]:  Using repository from filename:CSA_001b219d42b0.xml
+ 
+DEBUG 2012-04-26 15:05:52,140 [com.emc.celerra.startup.framework.WizController]:  validation code = 2
+ 
+DEBUG 2012-04-26 15:05:52,156 [com.emc.celerra.startup.framework.WizController]: calling next() method
+ 
+DEBUG 2012-04-26 15:06:06,953 [com.emc.celerra.startup.util.ConnectionManager]: Response code is 200
+ 
+DEBUG 2012-04-26 15:06:06,953 [com.emc.celerra.startup.util.ConnectionManager]: Response msg is OK
+ 
+DEBUG 2012-04-26 15:06:07,625 [com.emc.celerra.startup.util.ConnectionManager]: Response code is 200
+ 
+DEBUG 2012-04-26 15:06:07,625 [com.emc.celerra.startup.util.ConnectionManager]: Response msg is OK
+ 
+ERROR 2012-04-26 15:06:08,062 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:08,062 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:08,062 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+DEBUG 2012-04-26 15:06:08,078 [com.emc.celerra.startup.wrapper.PasswordPage]: Authentication for sysadmin user on 10.6.12.223 was sucessful
+ 
+DEBUG 2012-04-26 15:06:09,078 [com.emc.celerra.startup.wrapper.PasswordPage]: Authentication tried using HTTP for host : 10.6.12.223 was sucessful
+ 
+ERROR 2012-04-26 15:06:09,421 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:09,421 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:09,421 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+INFO  2012-04-26 15:06:09,437 [com.emc.celerra.startup.wrapper.VersionUtil]: CSA version: 7.1.41.2
+ 
+INFO  2012-04-26 15:06:09,437 [com.emc.celerra.startup.wrapper.VersionUtil]: Exclude versions: 5.6.36,5.6.37,5.6.38
+ 
+DEBUG 2012-04-26 15:06:09,437 [com.emc.celerra.startup.wrapper.PasswordPage]: Recheck NAS version 7.1.41-0 on host 10.6.12.223 failed
+ 
+ERROR 2012-04-26 15:06:09,875 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:09,875 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:09,875 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+ERROR 2012-04-26 15:06:12,140 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:12,140 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:12,140 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+DEBUG 2012-04-26 15:06:12,140 [com.emc.celerra.startup.wrapper.PasswordPage]: Block Version -----:05.32.000.3.837
+ 
+DEBUG 2012-04-26 15:06:13,156 [com.emc.celerra.startup.framework.WizController]:  validation code = 4
+ 
+ERROR 2012-04-26 15:06:16,312 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:16,312 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:16,312 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+ERROR 2012-04-26 15:06:16,484 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:16,484 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:16,484 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+DEBUG 2012-04-26 15:06:17,500 [com.emc.celerra.startup.framework.WizController]:  validation code = 2
+ 
+DEBUG 2012-04-26 15:06:17,500 [com.emc.celerra.startup.framework.WizController]: calling next() method
+ 
+INFO  2012-04-26 15:06:17,515 [com.emc.celerra.startup.util.SSHConnection]: CSA version 7.1.41.2
+ 
+INFO  2012-04-26 15:06:17,515 [com.emc.celerra.startup.util.SSHConnection]: clariion provisioning api filename is clariionProvAPI_7.1.41.2.tar.gz
+ 
+INFO  2012-04-26 15:06:17,515 [com.emc.celerra.startup.util.SSHConnection]: clariion provisioning api version is 7.1.41.2
+ 
+ERROR 2012-04-26 15:06:17,937 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:17,937 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:17,937 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+ERROR 2012-04-26 15:06:18,296 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:18,296 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:18,296 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+INFO  2012-04-26 15:06:18,296 [com.emc.celerra.startup.util.SSHConnection]: Result of running provision upgrade is version:string="7.1.41.2"
+ 
+INFO  2012-04-26 15:06:18,296 [com.emc.celerra.startup.configuration.ApplyPage]: Upgrade clariion provisioning API is true
+ 
+ERROR 2012-04-26 15:06:18,578 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:18,578 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:18,578 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+INFO  2012-04-26 15:06:18,578 [com.emc.celerra.startup.util.SSHConnection]: Result of checking backend status script is 1.9.2.5
+ 
+ERROR 2012-04-26 15:06:19,265 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:19,265 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:19,265 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+ERROR 2012-04-26 15:06:19,453 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:19,453 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:19,453 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+DEBUG 2012-04-26 15:06:19,593 [com.emc.celerra.startup.util.ConnectionManager]: Response code is 200
+ 
+DEBUG 2012-04-26 15:06:19,593 [com.emc.celerra.startup.util.ConnectionManager]: Response msg is OK
+ 
+DEBUG 2012-04-26 15:06:19,593 [com.emc.celerra.startup.configuration.BaseSetup]: Apache service check - true
+ 
+ERROR 2012-04-26 15:06:19,750 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:19,750 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:19,750 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+ERROR 2012-04-26 15:06:19,906 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:19,906 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:19,906 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+INFO  2012-04-26 15:06:19,906 [com.emc.celerra.startup.configuration.BaseSetup]: modjkSize from du -sxk /nas/http/modules/mod_jk.so is 596
+ 
+INFO  2012-04-26 15:06:19,906 [com.emc.celerra.startup.configuration.BaseSetup]: modjkSize from du -sxk /nas/http/webui/modules/mod_jk.so is 594
+ 
+INFO  2012-04-26 15:06:19,906 [com.emc.celerra.startup.configuration.BaseSetup]: Patch is already installed.
+ 
+DEBUG 2012-04-26 15:06:19,906 [com.emc.celerra.startup.util.ConnectionManager]: Checking tomcat service
+ 
+INFO  2012-04-26 15:06:19,906 [com.emc.celerra.startup.util.ConnectionManager]:  URL : https://10.6.12.223/index.jsp
+ 
+INFO  2012-04-26 15:06:19,953 [com.emc.celerra.startup.util.ConnectionManager]: Response code is 200 and msg is OK
+ 
+ERROR 2012-04-26 15:06:20,390 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:20,390 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:20,390 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+ERROR 2012-04-26 15:06:22,812 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:22,812 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:22,812 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+INFO  2012-04-26 15:06:22,812 [com.emc.celerra.startup.configuration.BaseSetup]: Model:VNX5700
+ 
+INFO  2012-04-26 15:06:22,812 [com.emc.celerra.startup.configuration.BaseSetup]: Nas Vesrion:7.1.41-0
+ 
+INFO  2012-04-26 15:06:22,812 [com.emc.celerra.startup.configuration.BaseSetup]: Block Vesrion:05.32.000.3.837
+ 
+ERROR 2012-04-26 15:06:23,046 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:23,046 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:23,046 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+DEBUG 2012-04-26 15:06:23,171 [com.emc.celerra.startup.util.ConnectionManager]: Response code is 200
+ 
+DEBUG 2012-04-26 15:06:23,171 [com.emc.celerra.startup.util.ConnectionManager]: Response msg is OK
+ 
+INFO  2012-04-26 15:06:23,203 [com.emc.celerra.startup.configuration.ApplyPage]:  Task : <html><body>User <i>nasadmin</i> authentication on primary Control Station</body></html> - Command Successful.
+ 
+ERROR 2012-04-26 15:06:23,453 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:23,453 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:23,453 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+INFO  2012-04-26 15:06:23,453 [com.emc.celerra.startup.configuration.ApplyPage]: Result of authenticating nasadmin is /home/nasadmin
+ 
+INFO  2012-04-26 15:06:23,468 [com.emc.celerra.startup.configuration.ApplyPage]:  Task : <html><body>User <i>nasadmin</i> authentication on secondary Control Station</body></html> - Command Successful.
+ 
+DEBUG 2012-04-26 15:06:23,625 [com.emc.celerra.startup.util.ConnectionManager]: Response code is 200
+ 
+DEBUG 2012-04-26 15:06:23,625 [com.emc.celerra.startup.util.ConnectionManager]: Response msg is OK
+ 
+INFO  2012-04-26 15:06:23,625 [com.emc.celerra.startup.configuration.ApplyPage]:  Task : <html><body>User <i>root</i> authentication on primary Control Station</body></html> - Command Successful.
+ 
+ERROR 2012-04-26 15:06:23,781 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:23,781 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:23,781 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+INFO  2012-04-26 15:06:23,781 [com.emc.celerra.startup.configuration.ApplyPage]: Result of authenticating root is /root
+ 
+INFO  2012-04-26 15:06:23,781 [com.emc.celerra.startup.configuration.ApplyPage]:  Task : <html><body>User <i>root</i> authentication on secondary Control Station</body></html> - Command Successful.
+ 
+DEBUG 2012-04-26 15:06:23,875 [com.emc.celerra.startup.configuration.BaseSetup]: Setting Timezone Asia/Shanghai on Primary CS
+ 
+INFO  2012-04-26 15:06:23,875 [com.emc.celerra.startup.util.ConnectionManager]:  URL : https://10.6.12.223/servlets/wizards
+ 
+DEBUG 2012-04-26 15:06:25,468 [com.emc.celerra.startup.util.WizClientRequest]: Host Address : method doCommand(): hostAddr : https://10.6.12.223/servlets/wizards?
+ 
+DEBUG 2012-04-26 15:06:25,468 [com.emc.celerra.startup.util.WizClientRequest]: Request : method doCommand(): requestStr : object=controlstation&command=modify&properties=timeZone%3DAsia%2FShanghai
+ 
+DEBUG 2012-04-26 15:06:25,468 [com.emc.celerra.startup.util.WizClientRequest]: The result of request:################
+msgInfo
+severity=Warningmessage=The time zone has been set successfully. Reboot the Control Station.fullMessage=The time zone has been set successfully. To make the change effective, reboot the Control Station.recommendedActions=Use the ccmdEscDoubleQuotesnas_cs -rebootccmdEscDoubleQuotes command to reboot the Control Station.id=17985699848queryString=ccmdIdccmdParamDelimiter17985699848ccmdParamDelimiterslotIdccmdParamDelimiter-1ccmdParamDelimitercreationTime=1335463634827slotId=-1
+
+ 
+DEBUG 2012-04-26 15:06:25,484 [com.emc.celerra.startup.configuration.ApplyPage]: TimeZone: Asia/Shanghai and time: 2012-04-27T03:06:25.000
+ 
+INFO  2012-04-26 15:06:25,484 [com.emc.celerra.startup.configuration.ApplyPage]:  Task : Time zone set up on primary Control Station - Command Successful.
+ 
+INFO  2012-04-26 15:06:25,484 [com.emc.celerra.startup.util.ConnectionManager]:  URL : https://10.6.12.223/servlets/wizards
+ 
+DEBUG 2012-04-26 15:06:28,671 [com.emc.celerra.startup.util.WizClientRequest]: Host Address : method doCommand(): hostAddr : https://10.6.12.223/servlets/wizards?
+ 
+DEBUG 2012-04-26 15:06:28,671 [com.emc.celerra.startup.util.WizClientRequest]: Request : method doCommand(): requestStr : object=controlstation&command=modify&properties=time%3D2012-04-27T03%3A06%3A25.000
+ 
+DEBUG 2012-04-26 15:06:28,671 [com.emc.celerra.startup.util.WizClientRequest]: The result of request:################
+msgInfo
+severity=OKmessage=OKfullMessage=No further information.recommendedActions=No actions are required.id=35165437953queryString=ccmdIdccmdParamDelimiter35165437953ccmdParamDelimiterslotIdccmdParamDelimiter-1ccmdParamDelimitercreationTime=1335463638006slotId=-1
+
+ 
+DEBUG 2012-04-26 15:06:28,671 [com.emc.celerra.startup.configuration.ApplyPage]: Sync backend time with CS time
+ 
+DEBUG 2012-04-26 15:06:28,671 [com.emc.celerra.startup.configuration.ApplyPage]: TimeZone: Asia/Shanghai and sync command : export NAS_DB=/nas && /nas/sbin/navicli -h 10.6.12.225 setsptime -M 4 -D 27 -Y 2012 -h 3 -m 6
+ 
+INFO  2012-04-26 15:06:28,671 [com.emc.celerra.startup.configuration.ApplyPage]:  Task : Time set up on primary Control Station - Command Successful.
+ 
+ERROR 2012-04-26 15:06:32,109 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:32,109 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:32,109 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+DEBUG 2012-04-26 15:06:32,109 [com.emc.celerra.startup.configuration.ApplyPage]: End of backend time sync
+ 
+DEBUG 2012-04-26 15:06:32,109 [com.emc.celerra.startup.configuration.ApplyPage]: Start Proxy ARP setup
+ 
+INFO  2012-04-26 15:06:32,109 [com.emc.celerra.startup.configuration.ApplyPage]:  Task : Storage system time setup - Command Successful.
+ 
+DEBUG 2012-04-26 15:06:32,109 [com.emc.celerra.startup.configuration.ApplyPage]: Proxy ARP Started
+ 
+INFO  2012-04-26 15:06:32,125 [com.emc.celerra.startup.configuration.BaseSetup]:  Nasversion is: 7.1.41-0
+ 
+INFO  2012-04-26 15:06:32,125 [com.emc.celerra.startup.configuration.BaseSetup]: Checking whether proxy arp is ready to be run 0
+ 
+INFO  2012-04-26 15:06:32,140 [com.emc.celerra.startup.configuration.ApplyPage]:  Task : Storage system IP address and System Name configuration - Setup for storage system IP address and System Name is in progress.
+ 
+ERROR 2012-04-26 15:06:34,421 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:34,421 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:34,421 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+INFO  2012-04-26 15:06:34,421 [com.emc.celerra.startup.configuration.BaseSetup]: Return code in checking if proxy arp is ready: 0
+ 
+ERROR 2012-04-26 15:06:34,718 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:34,718 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:34,718 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 35
+ 
+ERROR 2012-04-26 15:06:34,984 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:34,984 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:34,984 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+ERROR 2012-04-26 15:06:35,375 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:35,375 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:35,375 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+DEBUG 2012-04-26 15:06:35,375 [com.emc.celerra.startup.configuration.ApplyPage]: End of  Proxy ARP
+ 
+ERROR 2012-04-26 15:06:36,500 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:36,500 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:36,500 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+INFO  2012-04-26 15:06:36,500 [com.emc.celerra.startup.configuration.ApplyPage]: The security -list command execute successfully
+ 
+DEBUG 2012-04-26 15:06:36,500 [com.emc.celerra.startup.configuration.ApplyPage]: Change array name cmd: export NAS_DB=/nas && /nas/sbin/naviseccli -user sysadmin -password ** -scope 0 -h 10.6.12.225 arrayname rtpplat46cs0 -o
+ 
+ERROR 2012-04-26 15:06:38,656 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:38,656 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:38,656 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+DEBUG 2012-04-26 15:06:38,718 [com.emc.celerra.startup.configuration.ApplyPage]: End of Proxy ARP setup
+ 
+INFO  2012-04-26 15:06:38,718 [com.emc.celerra.startup.configuration.ApplyPage]:  Nasversion is: 7.1.41-0
+ 
+DEBUG 2012-04-26 15:06:38,718 [com.emc.celerra.startup.configuration.ApplyPage]: Domain join setup started
+ 
+ERROR 2012-04-26 15:06:38,953 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:38,953 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:38,953 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+INFO  2012-04-26 15:06:38,953 [com.emc.celerra.startup.configuration.ApplyPage]: Return code in executing domain join script: 0
+ 
+DEBUG 2012-04-26 15:06:38,953 [com.emc.celerra.startup.configuration.ApplyPage]: Control Station setup started
+ 
+DEBUG 2012-04-26 15:06:38,968 [com.emc.celerra.startup.configuration.BaseSetup]: Primary Control Station setup started
+ 
+INFO  2012-04-26 15:06:38,968 [com.emc.celerra.startup.util.ConnectionManager]:  URL : https://10.6.12.223/servlets/wizards
+ 
+INFO  2012-04-26 15:06:38,968 [com.emc.celerra.startup.configuration.ApplyPage]:  Task : VNX Domain Join setup - Command Successful.
+ 
+DEBUG 2012-04-26 15:06:45,250 [com.emc.celerra.startup.util.WizClientRequest]: Host Address : method doCommand(): hostAddr : https://10.6.12.223/servlets/wizards?
+ 
+DEBUG 2012-04-26 15:06:45,250 [com.emc.celerra.startup.util.WizClientRequest]: Request : method doCommand(): requestStr : object=controlstation&command=modify&properties=hostname%3Drtpplat46cs0%24%24%24DNSdomain%3Ddart.rtp.lab.emc.com%24%24%24searchDomains%3Ddart.rtp.lab.emc.com
+ 
+DEBUG 2012-04-26 15:06:45,250 [com.emc.celerra.startup.util.WizClientRequest]: The result of request:################
+msgInfo
+severity=OKmessage=OKfullMessage=No further information.recommendedActions=No actions are required.id=35165437953queryString=ccmdIdccmdParamDelimiter35165437953ccmdParamDelimiterslotIdccmdParamDelimiter-1ccmdParamDelimitercreationTime=1335463654601slotId=-1
+
+ 
+DEBUG 2012-04-26 15:06:45,250 [com.emc.celerra.startup.configuration.BaseSetup]: DNS and NTP command: export NAS_DB=/nas && /nas/bin/nas_cs -set -dns_servers 10.6.8.16,10.6.8.15 -dns_domain dart.rtp.lab.emc.com -ntp_servers 10.6.8.16 
+ 
+ERROR 2012-04-26 15:06:59,796 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:06:59,796 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:06:59,796 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+DEBUG 2012-04-26 15:06:59,796 [com.emc.celerra.startup.configuration.BaseSetup]: End of Primary Control Station setup
+ 
+DEBUG 2012-04-26 15:06:59,796 [com.emc.celerra.startup.configuration.BaseSetup]: Secondary Control Station setup started
+ 
+INFO  2012-04-26 15:06:59,796 [com.emc.celerra.startup.configuration.ApplyPage]:  Task : Primary Control Station setup - Command Successful.
+ 
+ERROR 2012-04-26 15:07:00,015 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:07:00,015 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:07:00,015 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+INFO  2012-04-26 15:07:00,031 [com.emc.celerra.startup.configuration.BaseSetup]: Return code for running mount /nas is: 0
+ 
+ERROR 2012-04-26 15:07:00,640 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:07:00,640 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:07:00,640 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+INFO  2012-04-26 15:07:00,640 [com.emc.celerra.startup.configuration.BaseSetup]: Return code for running export NAS_DB=/nas && /nas/http/webui/bin/hostname.pl -s rtpplat46cs1 is: 0
+ 
+ERROR 2012-04-26 15:07:01,078 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:07:01,078 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:07:01,078 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+INFO  2012-04-26 15:07:01,078 [com.emc.celerra.startup.configuration.BaseSetup]: Return code for running /nas/http/webui/bin/dnsdomain.pl -s dart.rtp.lab.emc.com is: 0
+ 
+ERROR 2012-04-26 15:07:01,250 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:07:01,250 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:07:01,250 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+INFO  2012-04-26 15:07:01,250 [com.emc.celerra.startup.configuration.BaseSetup]: Return code for running /nas/http/webui/bin/dnssearchdomains.pl -s dart.rtp.lab.emc.com is: 0
+ 
+ERROR 2012-04-26 15:07:01,437 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:07:01,437 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:07:01,437 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+INFO  2012-04-26 15:07:01,437 [com.emc.celerra.startup.configuration.BaseSetup]: Return code for running /nas/http/webui/bin/dnsservers.pl -s 10.6.8.16,10.6.8.15 is: 0
+ 
+ERROR 2012-04-26 15:07:01,656 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:07:01,656 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:07:01,656 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+INFO  2012-04-26 15:07:01,656 [com.emc.celerra.startup.configuration.BaseSetup]: Return code for running /nas/http/webui/bin/ntp.pl -s -servers 10.6.8.16 is: 0
+ 
+ERROR 2012-04-26 15:07:01,828 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:07:01,828 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:07:01,828 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+INFO  2012-04-26 15:07:01,828 [com.emc.celerra.startup.configuration.BaseSetup]: Return code for running /nas/http/webui/bin/timezone.pl -s Asia/Shanghai is: 0
+ 
+DEBUG 2012-04-26 15:07:01,828 [com.emc.celerra.startup.configuration.BaseSetup]: End of Secondary Control Station setup
+ 
+DEBUG 2012-04-26 15:07:01,828 [com.emc.celerra.startup.configuration.ApplyPage]: TimeZone: Asia/Shanghai and time: 2012-04-27T03:07:01.000
+ 
+INFO  2012-04-26 15:07:01,828 [com.emc.celerra.startup.configuration.BaseSetup]: Time set up on secondary Control Station. cs.getTimezone() is Asia/Shanghai and localTime is 2012-04-27T03:07:01.000
+ 
+INFO  2012-04-26 15:07:01,828 [com.emc.celerra.startup.configuration.ApplyPage]:  Task : Secondary Control Station setup - Command Successful.
+ 
+ERROR 2012-04-26 15:07:02,671 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:07:02,671 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:07:02,671 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 1
+ 
+INFO  2012-04-26 15:07:02,671 [com.emc.celerra.startup.configuration.BaseSetup]: Return code for running /nas/http/webui/bin/datetime.pl -s 2012-04-27T03:07:01.000 is: 1
+ 
+INFO  2012-04-26 15:07:02,671 [com.emc.celerra.startup.configuration.ApplyPage]:  Task : Time set up on secondary Control Station - Command Successful.
+ 
+ERROR 2012-04-26 15:07:02,843 [com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+ 
+ERROR 2012-04-26 15:07:02,843 [com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+ 
+DEBUG 2012-04-26 15:07:02,843 [com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+ 
+INFO  2012-04-26 15:07:02,843 [com.emc.celerra.startup.configuration.BaseSetup]: Return code for running umount /nas is: 0
+ 
+DEBUG 2012-04-26 15:07:02,890 [com.emc.celerra.startup.configuration.BaseSetup]: Licenses authentication started
+ 
+INFO  2012-04-26 15:07:02,890 [com.emc.celerra.startup.util.ConnectionManager]:  URL : https://10.6.12.223/servlets/wizards
+ 
+DEBUG 2012-04-26 15:07:05,765 [com.emc.celerra.startup.util.WizClientRequest]: Host Address : method doCommand(): hostAddr : https://10.6.12.223/servlets/wizards?
+ 
+DEBUG 2012-04-26 15:07:05,765 [com.emc.celerra.startup.util.WizClientRequest]: Request : method doCommand(): requestStr : object=license&command=modify&properties=name%3Dcifs%24%24%24licensed%3Dtrue
+ 
+DEBUG 2012-04-26 15:07:05,765 [com.emc.celerra.startup.util.WizClientRequest]: The result of request:################
+msgInfo
+severity=Errormessage=cifs ccmdEscColon an entry with this name already existsfullMessage=Duplicate name specifiedrecommendedActions=Specify a unqiue nameid=13421840550queryString=ccmdIdccmdParamDelimiter13421840550ccmdParamDelimiterparamName0ccmdParamDelimiterarg0ccmdParamDelimiterparamExtendedType0ccmdParamDelimiter-99ccmdParamDelimiterparamClass0ccmdParamDelimiterclass java.lang.StringccmdParamDelimiterparamBase0ccmdParamDelimiter8ccmdParamDelimiterparamValue0ccmdParamDelimitercifsccmdParamDelimiterslotIdccmdParamDelimiter-1ccmdParamDelimitercreationTime=1335463674980slotId=-1
+
+ 
+DEBUG 2012-04-26 15:07:05,796 [com.emc.celerra.startup.configuration.BaseSetup]: End of licenses cifs
+ 
+INFO  2012-04-26 15:07:05,796 [com.emc.celerra.startup.util.ConnectionManager]:  URL : https://10.6.12.223/servlets/wizards
+ 
+INFO  2012-04-26 15:07:05,796 [com.emc.celerra.startup.configuration.ApplyPage]:  Task : License CIFS setup - Command Successful.
+ 
+DEBUG 2012-04-26 15:07:23,609 [com.emc.celerra.startup.util.WizClientRequest]: Host Address : method doCommand(): hostAddr : https://10.6.12.223/servlets/wizards?
+ 
+DEBUG 2012-04-26 15:07:23,609 [com.emc.celerra.startup.util.WizClientRequest]: Request : method doCommand(): requestStr : object=license&command=modify&properties=name%3Dnfs%24%24%24licensed%3Dtrue
+ 
+DEBUG 2012-04-26 15:07:23,609 [com.emc.celerra.startup.util.WizClientRequest]: The result of request:################
+msgInfo
+severity=Errormessage=nfs ccmdEscColon an entry with this name already existsfullMessage=Duplicate name specifiedrecommendedActions=Specify a unqiue nameid=13421840550queryString=ccmdIdccmdParamDelimiter13421840550ccmdParamDelimiterparamName0ccmdParamDelimiterarg0ccmdParamDelimiterparamExtendedType0ccmdParamDelimiter-99ccmdParamDelimiterparamClass0ccmdParamDelimiterclass java.lang.StringccmdParamDelimiterparamBase0ccmdParamDelimiter8ccmdParamDelimiterparamValue0ccmdParamDelimiternfsccmdParamDelimiterslotIdccmdParamDelimiter-1ccmdParamDelimitercreationTime=1335463692936slotId=-1
+
+ 
+DEBUG 2012-04-26 15:07:23,609 [com.emc.celerra.startup.configuration.BaseSetup]: End of licenses nfs
+ 
+INFO  2012-04-26 15:07:23,609 [com.emc.celerra.startup.util.ConnectionManager]:  URL : https://10.6.12.223/servlets/wizards
+ 
+INFO  2012-04-26 15:07:23,609 [com.emc.celerra.startup.configuration.ApplyPage]:  Task : License NFS setup - Command Successful.
+ 
+DEBUG 2012-04-26 15:07:33,828 [com.emc.celerra.startup.util.WizClientRequest]: Host Address : method doCommand(): hostAddr : https://10.6.12.223/servlets/wizards?
+ 
+DEBUG 2012-04-26 15:07:33,828 [com.emc.celerra.startup.util.WizClientRequest]: Request : method doCommand(): requestStr : object=license&command=modify&properties=name%3DreplicatorV2%24%24%24licensed%3Dtrue
+ 
+DEBUG 2012-04-26 15:07:33,828 [com.emc.celerra.startup.util.WizClientRequest]: The result of request:################
+msgInfo
+severity=Errormessage=replicatorV2 ccmdEscColon an entry with this name already existsfullMessage=Duplicate name specifiedrecommendedActions=Specify a unqiue nameid=13421840550queryString=ccmdIdccmdParamDelimiter13421840550ccmdParamDelimiterparamName0ccmdParamDelimiterarg0ccmdParamDelimiterparamExtendedType0ccmdParamDelimiter-99ccmdParamDelimiterparamClass0ccmdParamDelimiterclass java.lang.StringccmdParamDelimiterparamBase0ccmdParamDelimiter8ccmdParamDelimiterparamValue0ccmdParamDelimiterreplicatorV2ccmdParamDelimiterslotIdccmdParamDelimiter-1ccmdParamDelimitercreationTime=1335463703148slotId=-1
+
+ 
+DEBUG 2012-04-26 15:07:33,828 [com.emc.celerra.startup.configuration.BaseSetup]: End of licenses replicatorV2
+ 
+INFO  2012-04-26 15:07:33,828 [com.emc.celerra.startup.util.ConnectionManager]:  URL : https://10.6.12.223/servlets/wizards
+ 
+INFO  2012-04-26 15:07:33,828 [com.emc.celerra.startup.configuration.ApplyPage]:  Task : License REPLICATORV2 setup - Command Successful.
+ 
+DEBUG 2012-04-26 15:07:44,593 [com.emc.celerra.startup.util.WizClientRequest]: Host Address : method doCommand(): hostAddr : https://10.6.12.223/servlets/wizards?
+ 
+DEBUG 2012-04-26 15:07:44,593 [com.emc.celerra.startup.util.WizClientRequest]: Request : method doCommand(): requestStr : object=license&command=modify&properties=name%3Dfilelevelretention%24%24%24licensed%3Dtrue
+ 
+DEBUG 2012-04-26 15:07:44,593 [com.emc.celerra.startup.util.WizClientRequest]: The result of request:################
+msgInfo
+severity=Errormessage=filelevelretention ccmdEscColon an entry with this name already existsfullMessage=Duplicate name specifiedrecommendedActions=Specify a unqiue nameid=13421840550queryString=ccmdIdccmdParamDelimiter13421840550ccmdParamDelimiterparamName0ccmdParamDelimiterarg0ccmdParamDelimiterparamExtendedType0ccmdParamDelimiter-99ccmdParamDelimiterparamClass0ccmdParamDelimiterclass java.lang.StringccmdParamDelimiterparamBase0ccmdParamDelimiter8ccmdParamDelimiterparamValue0ccmdParamDelimiterfilelevelretentionccmdParamDelimiterslotIdccmdParamDelimiter-1ccmdParamDelimitercreationTime=1335463713840slotId=-1
+
+ 
+DEBUG 2012-04-26 15:07:44,593 [com.emc.celerra.startup.configuration.BaseSetup]: End of licenses filelevelretention
+ 
+INFO  2012-04-26 15:07:44,593 [com.emc.celerra.startup.util.ConnectionManager]:  URL : https://10.6.12.223/servlets/wizards
+ 
+INFO  2012-04-26 15:07:44,593 [com.emc.celerra.startup.configuration.ApplyPage]:  Task : License FILELEVELRETENTION setup - Command Successful.
+ 
+DEBUG 2012-04-26 15:07:58,609 [com.emc.celerra.startup.util.WizClientRequest]: Host Address : method doCommand(): hostAddr : https://10.6.12.223/servlets/wizards?
+ 
+DEBUG 2012-04-26 15:07:58,609 [com.emc.celerra.startup.util.WizClientRequest]: Request : method doCommand(): requestStr : object=license&command=modify&properties=name%3Dsnapsure%24%24%24licensed%3Dtrue
+ 
+DEBUG 2012-04-26 15:07:58,609 [com.emc.celerra.startup.util.WizClientRequest]: The result of request:################
+msgInfo
+severity=Errormessage=snapsure ccmdEscColon an entry with this name already existsfullMessage=Duplicate name specifiedrecommendedActions=Specify a unqiue nameid=13421840550queryString=ccmdIdccmdParamDelimiter13421840550ccmdParamDelimiterparamName0ccmdParamDelimiterarg0ccmdParamDelimiterparamExtendedType0ccmdParamDelimiter-99ccmdParamDelimiterparamClass0ccmdParamDelimiterclass java.lang.StringccmdParamDelimiterparamBase0ccmdParamDelimiter8ccmdParamDelimiterparamValue0ccmdParamDelimitersnapsureccmdParamDelimiterslotIdccmdParamDelimiter-1ccmdParamDelimitercreationTime=1335463727725slotId=-1
+
+ 
+DEBUG 2012-04-26 15:07:58,609 [com.emc.celerra.startup.configuration.BaseSetup]: End of licenses snapsure
+ 
+INFO  2012-04-26 15:07:58,609 [com.emc.celerra.startup.configuration.ApplyPage]:  Task : License SNAPSURE setup - Command Successful.
+ 
+DEBUG 2012-04-26 15:07:58,656 [com.emc.celerra.startup.configuration.ApplyPage]: End of Control Station setup
+ 
+DEBUG 2012-04-26 15:07:58,656 [com.emc.celerra.startup.configuration.ApplyPage]: Data Mover setup started
+ 
+DEBUG 2012-04-26 15:07:58,656 [com.emc.celerra.startup.util.WizClientRequest]: Host Address : method getData(): hostAddr : https://10.6.12.223/servlets/wizards?
+ 
+DEBUG 2012-04-26 15:07:58,656 [com.emc.celerra.startup.util.WizClientRequest]: Request : method getData(): requestStr : object=filesystem&command=list&properties=name,hidden,type,id
+ 
+INFO  2012-04-26 15:07:58,656 [com.emc.celerra.startup.util.ConnectionManager]:  URL : https://10.6.12.223/servlets/wizards
+ 
+DEBUG 2012-04-26 15:07:58,750 [com.emc.celerra.startup.util.WizClientRequest]: Host Address : method getData(): hostAddr : https://10.6.12.223/servlets/wizards?
+ 
+DEBUG 2012-04-26 15:07:58,750 [com.emc.celerra.startup.util.WizClientRequest]: Request : method getData(): requestStr : object=mover&command=list&properties=name,role,location
+ 
+INFO  2012-04-26 15:07:58,750 [com.emc.celerra.startup.util.ConnectionManager]:  URL : https://10.6.12.223/servlets/wizards
+ 
+INFO  2012-04-26 15:08:22,859 [com.emc.celerra.startup.configuration.ApplyPage]:  Task : Get existing blade setup - Command Successful.
+ 
+ERROR 2012-04-26 15:08:22,859 [com.emc.celerra.startup.baseutil.i18n.MessageRetriever]: Argument count in key "apply.prog.dmrest" does not match argument size 2
+ 
+INFO  2012-04-26 15:08:22,859 [com.emc.celerra.startup.util.ConnectionManager]:  URL : https://10.6.12.223/servlets/wizards
+ 
+DEBUG 2012-04-26 15:08:27,015 [com.emc.celerra.startup.util.WizClientRequest]: Host Address : method doCommand(): hostAddr : https://10.6.12.223/servlets/wizards?
+ 
+DEBUG 2012-04-26 15:08:27,015 [com.emc.celerra.startup.util.WizClientRequest]: Request : method doCommand(): requestStr : object=mover&command=modify&properties=name%3Dserver_3%24%24%24ntpServers%3D10.6.8.16%24%24%24timeZone%3DAsia%2FShanghai%24%24%24unicodeEnabled%3Dtrue
+ 
+DEBUG 2012-04-26 15:08:27,015 [com.emc.celerra.startup.util.WizClientRequest]: The result of request:################
+msgInfo
+severity=Errormessage=Unicode has NOT been enabled on Data Mover server_3.fullMessage=recommendedActions=id=13691584555queryString=ccmdIdccmdParamDelimiter13691584555ccmdParamDelimiterparamName0ccmdParamDelimiterarg0ccmdParamDelimiterparamExtendedType0ccmdParamDelimiter-99ccmdParamDelimiterparamClass0ccmdParamDelimiterclass java.lang.StringccmdParamDelimiterparamBase0ccmdParamDelimiter8ccmdParamDelimiterparamValue0ccmdParamDelimiterserver_3ccmdParamDelimiterslotIdccmdParamDelimiter-1ccmdParamDelimitercreationTime=1335463753617slotId=-1severity=Errormessage=Invalid time zoneccmdEscColon Asia/Shanghai.fullMessage=The time zone name that you specified is invalid.recommendedActions=Verify the time zone name. The zone.tab file in the /usr/share/zoneinfo directory on the Control Station lists a subset of valid time zone names. Other acceptable timezone names are the 24 valid GMT timezones ranging from GMT-12 to GMT+12 and Universal.id=13421848615queryString=ccmdIdccmdParamDelimiter13421848615ccmdParamDelimiterparamName0ccmdParamDelimiterarg0ccmdParamDelimiterparamExtendedType0ccmdParamDelimiter-99ccmdParamDelimiterparamClass0ccmdParamDelimiterclass java.lang.StringccmdParamDelimiterparamBase0ccmdParamDelimiter8ccmdParamDelimiterparamValue0ccmdParamDelimiterAsia%2FShanghaiccmdParamDelimiterslotIdccmdParamDelimiter-1ccmdParamDelimitercreationTime=1335463755145slotId=-1severity=Errormessage=Unicode has NOT been enabled on Data Mover server_3.fullMessage=recommendedActions=id=13691584555queryString=ccmdIdccmdParamDelimiter13691584555ccmdParamDelimiterparamName0ccmdParamDelimiterarg0ccmdParamDelimiterparamExtendedType0ccmdParamDelimiter-99ccmdParamDelimiterparamClass0ccmdParamDelimiterclass java.lang.StringccmdParamDelimiterparamBase0ccmdParamDelimiter8ccmdParamDelimiterparamValue0ccmdParamDelimiterserver_3ccmdParamDelimiterslotIdccmdParamDelimiter-1ccmdParamDelimitercreationTime=1335463753617slotId=-1severity=Infomessage=Successfully modified propertiesccmdEscColon ntpServersfullMessage=The list of properties were modified successfully.recommendedActions=id=26575503452queryString=ccmdIdccmdParamDelimiter26575503452ccmdParamDelimiterparamName0ccmdParamDelimiterpropsccmdParamDelimiterparamExtendedType0ccmdParamDelimiter-99ccmdParamDelimiterparamClass0ccmdParamDelimiterclass java.lang.StringccmdParamDelimiterparamBase0ccmdParamDelimiter8ccmdParamDelimiterparamValue0ccmdParamDelimiterntpServersccmdParamDelimiterslotIdccmdParamDelimiter-1ccmdParamDelimitercreationTime=1335463755151slotId=-1severity=Errormessage=Invalid time zoneccmdEscColon Asia/Shanghai.fullMessage=The time zone name that you specified is invalid.recommendedActions=Verify the time zone name. The zone.tab file in the /usr/share/zoneinfo directory on the Control Station lists a subset of valid time zone names. Other acceptable timezone names are the 24 valid GMT timezones ranging from GMT-12 to GMT+12 and Universal.id=13421848615queryString=ccmdIdccmdParamDelimiter13421848615ccmdParamDelimiterparamName0ccmdParamDelimiterarg0ccmdParamDelimiterparamExtendedType0ccmdParamDelimiter-99ccmdParamDelimiterparamClass0ccmdParamDelimiterclass java.lang.StringccmdParamDelimiterparamBase0ccmdParamDelimiter8ccmdParamDelimiterparamValue0ccmdParamDelimiterAsia%2FShanghaiccmdParamDelimiterslotIdccmdParamDelimiter-1ccmdParamDelimitercreationTime=1335463755145slotId=-1severity=Errormessage=Unicode has NOT been enabled on Data Mover server_3.fullMessage=recommendedActions=id=13691584555queryString=ccmdIdccmdParamDelimiter13691584555ccmdParamDelimiterparamName0ccmdParamDelimiterarg0ccmdParamDelimiterparamExtendedType0ccmdParamDelimiter-99ccmdParamDelimiterparamClass0ccmdParamDelimiterclass java.lang.StringccmdParamDelimiterparamBase0ccmdParamDelimiter8ccmdParamDelimiterparamValue0ccmdParamDelimiterserver_3ccmdParamDelimiterslotIdccmdParamDelimiter-1ccmdParamDelimitercreationTime=1335463753617slotId=-1
+
+ 
+ERROR 2012-04-26 15:08:27,015 [com.emc.celerra.startup.baseutil.i18n.MessageRetriever]: Argument count in key "apply.task.dmrest" does not match argument size 2
+ 
+INFO  2012-04-26 15:08:27,015 [com.emc.celerra.startup.configuration.ApplyPage]:  Task : NTP server, time zone and unicode properties set up on primary blade 3 - Command Failed.
+ 

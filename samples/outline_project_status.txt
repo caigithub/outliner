@@ -1,0 +1,33 @@
+solution {
+    use vim fold function
+}
+
+input {
+    drag a file
+    [done] command line
+    [done] ui open file dialog
+}
+
+search {
+    regex normal text toggle
+}
+
+visual {
+    [bug] first text display additonal char #
+    cannot highlight node text
+    support text output
+}
+
+operation {
+    copy text
+    jump to next
+    open in editor
+}
+
+intergration {
+    vim
+    ide
+    linux shell
+    windows command line
+}
+

@@ -1,0 +1,2033 @@
+################################################################################
+# This is the confidential unpublished intellectual property of EMC Corporation,
+# and includes without limitation exclusive copyright and trade secret rights
+# of EMC throughout the world.
+################################################################################
+package Automatos::Controller;
+
+=begin nd
+
+Package: Automatos::Controller
+
+=cut
+
+=begin nd
+
+Topic: Abstract
+This package contains all methods used to manage, run and monitor all components
+of a test set. The controller will be responsible for executing each lifecycle
+of a test set.
+
+=cut
+
+use strict;
+use warnings;
+use File::Path 2.06 qw(make_path);
+use Data::Dumper;
+use File::Spec;
+use IO::Handle;
+use POSIX;
+use Readonly;
+use Automatos::Exception;
+use Automatos::AutoLog;
+use Automatos::Parameter;
+use Automatos::Test::Base;
+use Automatos::ParamValidate qw(validate_pos validate :types validate_with :callbacks);
+use Automatos::Engine::Configuration;
+use Automatos::Util::Threads qw(startThread waitForThreads);
+use AutomatosX::TmsDataExtractor;
+use Automatos::Util::HostMonitor;
+use Automatos::Device::Host;
+use Automatos::Util::Units qw(:all);
+
+use AutomatosX::Constants qw($UTMS_RUNNING_STATUS);
+
+###############
+#   Globals   #
+###############
+my $gLog = Automatos::AutoLog->getLogger(__PACKAGE__);
+my ($gStopOnError, $gLoggingLevel, $gLogRotationSize, $gConfigStopOnError, $gMonitorInterval, $gLogMaxSize ) = undef;
+Readonly my  $TEST_SET => 'test_set';
+Readonly my  $TEST_CASE => 'test_case';
+Readonly my  $TEST_CONFIG => 'test_config';
+Readonly my  $MAIN => 'main';
+Readonly my  $PRE => 'pre';
+Readonly my  $POST => 'post';
+Readonly my  $PASS => 'pass';
+Readonly my  $FAIL => 'fail';
+Readonly my  $DONE => 'done';
+Readonly my  $NONE => 'None';
+Readonly my  $INIT => 'init';
+Readonly my  $NOT_RUN => 'not_run';
+Readonly my  $INCOMPLETE => 'incomplete';
+Readonly my  $COMPLETE => 'complete';
+Readonly my  $CONFIG_ERROR => 'config_error';
+Readonly my  $INIT_TEST_SET => '-InitTestSet-';
+Readonly my  $PRE_TEST_SET => '-PreTestSet-';
+Readonly my  $POST_TEST_SET => '-PostTestSet-';
+Readonly my  $DONE_TEST_SET => '-DoneTestSet-';
+
+=begin nd
+
+Method: new
+Creates a Controller object, which is used to run, monitor and report items
+that occur throughout the lifecycle of a test set.  This class can be thought
+of as the command and control unit of Automatos.
+
+Input:
+A hash containing the following key/pairs
+
+testset    => $  An <Automatos::Test::Set> object containing tests to run
+exe_params => \@ An array list containing all execution parameters
+
+Returns:
+An <Automatos::Controller> object.
+
+Exceptions:
+*None*
+
+=cut
+
+sub new
+{
+    my $objtype = shift(@_);
+    my  %params = validate(@_,{
+                                testset    => {isa => 'Automatos::Test::Set'},
+                                exe_params => {type => ARRAYREF},
+                              });
+    my ($self) = bless {}, $objtype;
+    $self->{testset} = $params{testset};
+    $self->{testset}->_setController($self);
+    #initilaizing testset_error to zero as the testset has not been executed.
+    $self->{testset_error} = 0;
+    $self->createExecutionParameters(exe_params => $params{exe_params});
+    #having YAML::Any installed is a requirement only for Automatos-X. Hence,
+    #the scope of eval is kept to minimum.
+    eval {
+        require YAML::Any;
+        my $path = Automatos::AutoLog::getLogDir() . '/status.yml';
+        if (open(my $fh, '>', $path)) {
+            $fh->autoflush(1);
+            $self->{status_log} = $fh;
+        }
+    };
+    if (my $e = Exception::Class->caught()) {
+        my $msg = ref($e) ? $e->full_message() : $e;
+        $gLog->debug("Unable to setup status logging:\n$msg");
+    }
+    #testset-information
+    my $testSet = $self->getTestSet();
+    my $name = $testSet->getName();
+    my $id = $testSet->getIdentity(id_type => 'ax_id');
+    #TODO: Write @ARGV to the status file as well.  The tricky part is getting
+    # argv to propogate through to this new as @ARGV is emptied by getopt.
+    my %statusToWrite;
+    $statusToWrite{'what'} = $TEST_SET;
+    $statusToWrite{'id'} = $id if (defined $id);
+    $statusToWrite{'name'} = $name if (defined $name);
+    $statusToWrite{'status'}{'current_stage'} = $INIT;
+    $statusToWrite{'status'}{'currently_running_test'} = $INIT_TEST_SET;
+    $statusToWrite{'status'}{'process_id'} = $$;
+    $statusToWrite{'status'}{'program_name'} = $0;
+    $self->writeStatus(%statusToWrite);
+    delete $statusToWrite{'status'};
+    foreach my $testObj ($testSet->getTests()) {
+        my $testName = $testObj->getName();
+        my $id = $self->_getIdentityOfTest($testObj);
+        $statusToWrite{'id'} = $id if (defined $id);
+        $statusToWrite{'name'} = $testName if (defined $testName);
+        $statusToWrite{'status'}{'current_stage'} = $NOT_RUN;
+        if ($testObj->isa('Automatos::Test::Configuration')) {
+            $statusToWrite{'what'} = $TEST_CONFIG;
+            $self->writeStatus(%statusToWrite);
+        }
+        else {
+            $statusToWrite{'what'} = $TEST_CASE;
+            $self->writeStatus(%statusToWrite);
+        }
+    }
+    $self->{test_counter} = 0;
+    $self->{currently_running} = undef;  # A place holder to hold the test object currently being
+                                         #  run by the controller.
+    $self->{post_test_set_executed} = 0;
+    return $self;
+}
+
+=begin nd
+
+Method: runTestSet
+Starts the execution of the test set. This method will perform the preTestSet
+steps, followed by each test's steps, concluding with a postTestSet step
+once all tests have completed.
+
+Input:
+*None*
+
+Returns:
+*None*
+
+Exceptions:
+PRE_TEST_SET_ERROR  - Error occurred while performing pre TestSet tasks.
+POST_TEST_SET_ERROR - Error occurred while performing post TestSet tasks.
+
+=cut
+
+sub runTestSet
+{
+    my ($self) = shift(@_);
+    
+    my $testSet = $self->getTestSet();
+    my $name = $testSet->getName();
+    my $id = $testSet->getIdentity(id_type => 'ax_id');
+    $self->{test_set_start_time} = time();
+
+    my %status;
+    $testSet->setStatus($Automatos::Test::Base::RUNNING);
+    # get the execution parameter values.
+    $gLog->info("Setting the execution parameters.");
+
+    my @exeParams = $self->getExecutionParameterObjects();
+    foreach my $exeParam(@exeParams) {
+        if ($exeParam->getName() =~ /STOP_ON_ERROR/i) {
+            $gStopOnError = $exeParam->getValue();
+        }
+        elsif ($exeParam->getName() =~ /LOGGING_LEVEL/i) {
+            $gLoggingLevel = $exeParam->getValue();
+        }
+        elsif ($exeParam->getName() =~ /LOG_ROTATION_SIZE/i) {
+            $gLogRotationSize = $exeParam->getValue();
+        }
+        elsif ($exeParam->getName() =~ /STOP_ON_CONFIG_ERROR/i) {
+            $gConfigStopOnError = $exeParam->getValue();
+        }
+        elsif ($exeParam->getName() =~ /MONITOR_INTERVAL/i) {
+            $gMonitorInterval = $exeParam->getValue();
+        }
+        elsif ($exeParam->getName() =~ /MAX_LOG_SIZE/i) {
+            $gLogMaxSize = $exeParam->getValue();
+        }
+    }
+    $gLog->info("The logging level is set to : $gLoggingLevel");
+    $gLog->info("The stop on error value is : $gStopOnError");
+    $gLog->info("The log rotation size is : $gLogRotationSize") if defined($gLogRotationSize);
+    $gLog->info("The max log size is : $gLogMaxSize") if defined($gLogMaxSize);
+
+    #set the screen logging level to that defined by the user
+    Automatos::AutoLog->setScreenLogLevel($gLoggingLevel);
+
+    #construct the status
+    $status{'what'} = $TEST_SET;
+    $status{'id'} = $id if (defined $id);
+    $status{'name'} = $name if (defined $name);
+    # Run the PreTestSet
+    $status{'status'}{'current_stage'} = $PRE;
+    $status{'status'}{'currently_running_test'} = $PRE_TEST_SET;
+    $self->writeStatus(%status);
+    $self->preTestSet();
+
+    $self->startMonitor();
+    
+    # Run each Test
+    $self->runTests();
+
+    # Run the PostTestSet
+    $status{'status'}{'current_stage'} = $POST;
+    $status{'status'}{'currently_running_test'} = $POST_TEST_SET;
+    $self->writeStatus(%status);
+    $self->postTestSet();
+}
+
+=begin
+
+Method: _handleException
+Checks for exceptions in runTests method.
+
+Input:
+A hash with the following key/value pairs:
+
+test_object => $ - The <Automatos::Test::Base> object that we're testing for failure.
+stage       => $ - Fed into writeStatus ($PRE | $MAIN | $POST) Default: $MAIN
+exception   => $ - String stating the exception or an <Automatos::Exception> object
+failed_hook_point => $ - *Optional* Name of the hook point that failed
+
+Returns:
+*None*
+
+Exceptions:
+PRE_TEST_ERROR  - Error occurred while performing pre-test tasks.
+TEST_ERROR      - Error occurred while performing the actual test.
+POST_TEST_ERROR - Error occurred while performing post-test tasks.
+
+=cut
+
+sub _handleException #%params
+{
+    my ($self) = shift(@_);
+
+    my %params = validate(@_, {
+        test_object     => { isa => 'Automatos::Test::Base'},
+        exception       => { type => SCALAR|OBJECT},
+        stage           => { type => SCALAR,
+                             default => $MAIN},
+        failed_hook_point => { type => SCALAR, default => ''},
+    });
+
+    my $testName = $params{test_object}->getName();
+    my $id = $self->_getIdentityOfTest($params{'test_object'});
+    # What failed?
+    my $what;
+    if ($params{test_object}->isa('Automatos::Test::Case')) {
+        $what = $TEST_CASE;
+    }
+    elsif ($params{test_object}->isa('Automatos::Test::Configuration')) {
+        $what = $TEST_CONFIG;
+    }
+
+    #Utms reporting?
+    my ($utmsRepObj, $buildId, $platformId);
+
+    # Retrieve our message
+    my $msg;
+    if (ref($params{exception}) && $params{exception}->can('full_message')) {
+        $msg = $params{exception}->full_message();
+    }
+    else {
+        $msg = "$params{exception}\n";
+    }
+
+    # Set the 'failure_reason' key on the test
+    if(defined($params{test_object}{failure_reason}) && $params{test_object}{failure_reason}) {
+        # Add a easy to spot separator
+        $params{test_object}{failure_reason} .= "\n---------------------------------------------\n";
+    } 
+    $params{test_object}{failure_reason} .= "Test Stage [$params{stage}] Failed because:\n" . $msg;
+
+    # Set status and perform fails
+    if ($what eq $TEST_CONFIG) {
+        $params{test_object}->setStatus($Automatos::Test::Base::FAIL);
+        #we setTestError to 1 because an error occurred while
+        #executing the testset. This will enable us to decide the
+        #final status of the testset at the posttestset stage.
+        $gLog->tcFail($testName . " failed because an " .
+                      "issue occurred while trying to run the " .
+                      "test configuration:\n" . $msg);
+    }
+    elsif ($params{stage} eq $PRE) {
+        #Set status to config error
+        $params{test_object}->setStatus($Automatos::Test::Base::CONFIG_ERROR);
+        $gLog->preTcFail("An issue occurred while trying to run the ".
+                         "preTestCase steps for " . $testName . ":\n" .
+                         $msg);
+    }
+    elsif ($params{stage} eq $MAIN) {
+        # set status to Fail due to error
+        $params{test_object}->setStatus($Automatos::Test::Base::FAIL);
+        $gLog->tcFail($testName . " failed because an " .
+                      "issue occurred while trying to run the " .
+                      "test case:\n" . $msg);
+        #Need to increase the error count so if $self->getErrorCount() is called
+        #in the postTestCase it won't return 0 since only logError and logFatal do that
+        $params{test_object}->incrementErrorCount();
+    }
+    elsif ($params{stage} eq $POST) {
+        $gLog->postTcFail("An issue occurred while trying to run the ".
+                          "postTestCase steps for " . $testName .
+                          ":\n" . $msg);
+    }
+    $gLog->trace("$params{exception}");
+
+    # Set up status to be fed into the $self->writeStatus method
+    my %status;
+    $status{current_stage} = $params{stage};
+    if ($params{stage} eq $MAIN) {
+        $status{main_status} = $FAIL;
+    }
+    elsif ($params{stage} eq $PRE) {
+        $status{pre_status} = $FAIL;
+        $status{main_status} = $CONFIG_ERROR;
+    }
+    elsif ($params{stage} eq $POST) {
+        $status{post_status} = $FAIL;
+    }
+    $status{'duration'} = (time() - $self->{start_time}) . 'S';
+    my %statusToWrite;
+    $statusToWrite{'what'} = $what;
+    $statusToWrite{'id'} = $id if (defined $id);
+    $statusToWrite{'name'} = $testName;
+    %{$statusToWrite{'status'}} = %status;
+    $self->writeStatus(%statusToWrite);
+    $self->setTestSetError(1);
+    # Usually a POST fail would not trigger a case to fail (see next if)
+    if ($what ne $TEST_CONFIG && $params{stage} ne $POST) {
+        $self->updateStatus();
+    }
+    # Unless the reason it failed was because of a triage or information
+    #  collecting HOOK.  So even if we're in POST a hook point
+    #  can have the right to fail a test (for instance, maybe the box
+    #  made a core dump and the hook noticed)
+    if($params{stage} eq $POST && $params{failed_hook_point}) {
+        $self->updateStatus();
+    }
+    
+    # Now do utms reporting if specified
+#todo: remove if we continue to post results after the postTestCase.
+#    $self->reportResultsToUtms($params{test_object});
+
+    #if it's test config, $gConfigStopOnError should be tested
+    #else, it's test case, and $gStopOnError should be tested
+    if ( ($params{test_object}->isa("Automatos::Test::Configuration") && $gConfigStopOnError )
+        ||($gStopOnError) ) {
+            # Check for stop on error and run hooks
+            if ($params{stage} eq $POST) {
+                if($params{failed_hook_point} ne 'afterPostTest') { 
+                    # Only run this hook if the reason we're entering _handleException
+                    #  isn't because we just failed because of this hook point
+                    $self->runHooks('afterPostTest');
+                }
+            }
+            else {
+                if ($params{stage} eq $PRE) {
+                    if($params{failed_hook_point} ne 'afterPreTest') { 
+                        # Only run this hook if the reason we're entering _handleException
+                        #  isn't because we just failed because of this hook point
+                        $self->runHooks('afterPreTest');
+                    }
+                }
+                if($params{failed_hook_point} ne 'afterMainTest') { 
+                    # Only run this hook if the reason we're entering _handleException
+                    #  isn't because we just failed because of this hook point
+                    $self->runHooks('afterMainTest');
+                }
+                if($params{failed_hook_point} ne 'afterPostTest') { 
+                    # Only run this hook if the reason we're entering _handleException
+                    #  isn't because we just failed because of this hook point
+                    $self->runHooks('afterPostTest');
+                }
+            }
+            $self->postTestSet();
+            # Post failed result to UTMS if necessary.
+            $self->reportResultsToUtms($params{test_object});
+            die $params{exception};
+    }
+}
+
+
+=begin nd
+
+Method: runTests
+Starts the execution of the test. This method will perform the preTestCase
+steps, followed by that test's steps, concluding with a postTestCase step
+once all tests have completed.
+
+Input:
+*None*
+
+Returns:
+*None*
+
+Exceptions:
+PRE_TEST_ERROR  - Error occurred while performing pre Test tasks.
+TEST_ERROR      - Error occurred while performing the actual test.
+POST_TEST_ERROR - Error occurred while performing post Test tasks.
+
+=cut
+
+sub runTests
+{
+    my ($self) = @_;
+
+    $gLog->info('Controller.pm (runTests) - Running all Tests');
+    #update the status of every test in the graphical display in
+    #main rollup log file before starting the test run
+    my @tests = $self->getTestSet()->getTests();
+    $self->updateStatus();
+    #reporting results to utms
+    my ($utmsRepObj, $buildId, $platformId);
+
+    #stop_on_error=0, so irrespective of the pre_test_set passing or failing,
+    #it will end over here. Now the links in main_rollup and last rotated log
+    #files need to be created
+    Automatos::AutoLog->createLogRotationLink();
+
+    my @ranTestObj =();
+    my $preTestObj;
+    foreach my $testObj (@tests) {
+        if ($preTestObj) {
+            #save the previous test case/config
+            push ( @ranTestObj, $preTestObj);
+            $preTestObj = $testObj;
+        }
+        else {
+            #first time in the loop
+            $preTestObj = $testObj;
+        }
+        $self->getTestSet()->setRunHistory(\@ranTestObj);
+
+        $self->{currently_running} = $testObj;
+        $self->{start_time} = time(); # Set a start time for this test object
+        #Getting test_set and test information to write to status.yml
+        my $testSet = $testObj->getTestSet();
+        my $testSetID =  $testSet->getIdentity(id_type => 'ax_id');
+        my $testSetName = $testSet->getName();
+        my $testName = $testObj->getName();
+        my $testId = $self->_getIdentityOfTest($testObj);
+        my @testDependencies=$testObj->getDependencies();
+        my %status;
+        #update the currently running test of the testset in the status hash
+        #that will be written to status.yml
+        $status{'what'} = $TEST_SET;
+        $status{'id'} = $testSetID if (defined $testSetID);
+        $status{'name'} = $testSetName if (defined $testSetName);
+        $status{'status'}{'current_stage'} = $MAIN;
+        $status{'status'}{'currently_running_test'} = $testName;
+        $self->writeStatus(%status);
+        delete $status{'status'};
+
+        #set the test name and test id in the status hash that will be written
+        #to status.yml
+        $status{'id'} = $testId if (defined $testId);
+        $status{'name'} = $testName if (defined $testName);
+
+        #create the test (case/config) file and change the file path
+        my $tcFile = $self->createTestLogFile($testName);
+        Automatos::AutoLog->changeDetailLogFile(new_file => $tcFile);
+        $testObj->logParameters();
+
+        my $dependenciesCondition=1;
+        my $breakTestName;
+        my $breakTestStatus;
+        for my $item (@testDependencies){
+            my $dependencyType=$item->{type};
+            my $dependencyName=$item->{name};
+            #get all the test objects
+            @tests = $self->getTestSet()->getTests();
+            #go through each test object to check whether matching the required
+            #dependency condition
+            foreach my $testObj (@tests) {
+                if ($testObj->isa("Automatos::Test::Case")
+                    || $testObj->isa("Automatos::Test::Configuration") ) {
+                    my $tempName=$testObj->getName();
+                    my $tempStatus=$testObj->getStatus();
+                    if ($dependencyType =~ /complete/i){
+                        if ($dependencyName =~ /$tempName/i && $tempStatus =~ /run/i){
+                            $dependenciesCondition=0;
+                            $breakTestName=$tempName;
+                            $breakTestStatus=$tempStatus;
+                            last;
+                        }
+                    }
+                    else {
+                        if ( $dependencyName =~ /$tempName/i && $dependencyType !~ m/$tempStatus/i){
+                            $dependenciesCondition=0;
+                            $breakTestName=$tempName;
+                            $breakTestStatus=$tempStatus;
+                            last;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!$dependenciesCondition){
+             $gLog->tConfigStart("Test Dependencies Failed -- Test Name: ". ref($testObj) ." -- Reason: $breakTestName, $breakTestStatus");
+             $gLog->info("TEST ($testName) Dependencies failed: $breakTestName, $breakTestStatus");
+             next;
+        }
+
+
+        # Iterate through all the hooks
+        $self->runHooks('beforePreTest');
+        #if it is test configuration object
+        if ($testObj->isa("Automatos::Test::Configuration")) {
+            $gLog->tConfigStart('TestConfig '. ref($testObj) .' starts.');
+            $self->runHooks('afterPreTest');
+            $status{'what'} = $TEST_CONFIG;
+            $status{'status'}{'current_stage'} = $MAIN;
+            #Config mode
+            if ($testObj->getParameter(name => 'Mode') =~ m/^Config$/i) {
+                $self->writeStatus(%status);
+                $gLog->info('###CONFIGURATION MODE###');
+                eval{$testObj->_runConfiguration();};
+                if (my $e = Exception::Class->caught()) {
+                    $self->_handleException(test_object    => $testObj,
+                                            exception      => $e,
+                                            stage          => $MAIN)
+                }
+                else {
+                    $status{'status'}{'main_status'} = $PASS;
+                    $status{'status'}{'duration'} = (time() - $self->{start_time}) . 'S';
+                    $self->writeStatus(%status);
+                    $testObj->setStatus($Automatos::Test::Base::CONFIGURED);
+                    $gLog->tConfigured($testName.' has been ' .
+                                       'successfully configured.');
+                }
+                $status{'status'}{'current_stage'} = $DONE;
+                $self->writeStatus(%status);
+            }
+            #Deconfig mode
+            elsif ($testObj->getParameter(name => 'Mode') =~ m/^Deconfig$/i) {
+                $gLog->info('###DE-CONFIGURATION MODE###');
+                $self->writeStatus(%status);
+                eval{$testObj->deconfiguration();};
+                if (my $e = Exception::Class->caught()) {
+                    $self->_handleException(test_object    => $testObj,
+                                            exception      => $e,
+                                            stage          => $MAIN);
+                }
+                else {
+                    $testObj->setStatus($Automatos::Test::Base::DECONFIGURED);
+                    $status{'status'}{'main_status'} = $PASS;
+                    $status{'status'}{'duration'} = (time() - $self->{start_time}) . 'S';
+                    $self->writeStatus(%status);
+                    $gLog->tDeconfigured($testName.' has been successfully ' .
+                                         'de-configured.');
+                }
+                $status{'status'}{'current_stage'} = $DONE;
+                $self->writeStatus(%status);
+            }
+            $self->runHooks('afterMainTest');
+            $self->runHooks('afterPostTest');
+        }
+        #it is a test case object
+        else {
+            #set the status to Running...
+            $testObj->setStatus($Automatos::Test::Base::RUNNING);
+
+            # Post a record saying that the run is starting.
+            $self->reportResultsToUtms($testObj);
+
+            #Automatos engine start if exists requirement
+            my @configs = $testObj->getRequirement(type => 'configuration');
+            #pre-test-case
+            $status{'what'} = $TEST_CASE;
+            $status{'status'}{'current_stage'} = $PRE;
+            $self->writeStatus(%status);
+            $gLog->tcStart('TestCase '. ref($testObj) .' starts.');
+            $gLog->info('###PRE-TESTCASE###');
+
+            my @threads;
+            foreach my $configObject (@configs){
+                #add device in configuration object for engine use
+                my $dev = $self->_selectDeviceForEngine($configObject,$testObj);
+                
+                if(defined($dev)) {
+                    #Set the device on the config requirement.
+                    $configObject->setDevice(device => $dev);
+                }
+                #multi-thread for each device
+                my $threadSub = sub { 
+                    unless (defined ($configObject->{device})){
+                         Automatos::Exception::Base->throw("An appropriate device could not be found "
+                         ."to apply this configuration. Either all devices have had a configuration".
+                         " applied to them already or there are no devices of the appropriate type in the test bed.");
+                    }
+                    Automatos::Engine::Configuration->apply(requirement => $configObject);
+                    
+                };
+                my $thread = startThread(code => $threadSub);
+                push @threads,$thread;    
+            }
+            
+            eval{
+                if(@threads) {
+                    waitForThreads(threads => \@threads);
+                }
+                $testObj->preTestCase();
+            };
+
+            my $prePassed = 1;
+            if (my $e = Exception::Class->caught()) {
+                $self->_handleException(test_object       => $testObj,
+                                        exception         => $e,
+                                        stage             => $PRE);
+                $prePassed = 0;
+                # Iterate through all the hooks and execute their code blocks
+                $self->runHooks('afterPreTest');
+            }
+            else{
+                # Iterate through all the hooks and execute their code blocks
+                $self->runHooks('afterPreTest');
+                # get status of test object, if status if fail by hook, throw the exception
+                my $status = $testObj->getStatus();
+                if ($status =~ /fail/i){
+                    $self->_handleException(test_object     => $testObj,
+                                            exception       => "Hook fail",
+                                            failed_hook_point => 'afterPreTest',
+                                            stage           => $PRE);
+                    $prePassed = 0;
+                }
+            }
+            my $mainPassed = 1;
+
+            if ($prePassed) {
+                #main-execution
+                $gLog->info('###MAIN###');
+
+                $status{'status'}{'pre_status'} = $PASS;
+                $status{'status'}{'duration'} = (time() - $self->{start_time}) . 'S';
+                $self->writeStatus(%status);
+                delete $status{'status'};
+                $status{'status'}{'current_stage'} = $MAIN;
+                eval{$testObj->main();};
+                if (my $e = Exception::Class->caught()) {
+                    $self->_handleException(test_object     => $testObj,
+                                            exception       => $e,
+                                            stage           => $MAIN);
+                    # Iterate through all the hooks and execute their code blocks
+                    $self->runHooks('afterMainTest');
+                    $mainPassed = 0;
+                }
+                else {
+                    # Iterate through all the hooks and execute their code blocks
+                    $self->runHooks('afterMainTest');
+                    # get status of test object, if status if fail by hook, throw the exception
+                    my $status = $testObj->getStatus();
+                    if ($status =~ /fail/i){
+                        $self->_handleException(test_object     => $testObj,
+                                                exception       => "Hook fail",
+                                                failed_hook_point => 'afterMainTest',
+                                                stage           => $MAIN);
+                    }
+                    else{
+                        # No exception occurred hence set status to PASS..
+                        $gLog->tcPass($testName.' has passed.');
+                        $testObj->setStatus($Automatos::Test::Base::PASS);
+                        $status{'status'}{'main_status'} = $PASS;
+                        $status{'status'}{'duration'} = (time() - $self->{start_time}) . 'S';
+                        $self->writeStatus(%status);
+                        delete $status{'status'};
+                        $self->updateStatus();
+                    }
+                }
+            }
+            else{
+                # Iterate through all the hooks and execute their code blocks
+                $self->runHooks('afterMainTest');
+            }
+
+            #post-test-case, it will be run even if preTestCase() or main()
+            #of the testcase failed
+            $gLog->info('###POST-TESTCASE###');
+            $status{'status'}{'current_stage'} = $POST;
+            $self->writeStatus(%status);
+            eval{$testObj->postTestCase();};
+            if (my $e = Exception::Class->caught()) {
+                $self->_handleException(test_object    => $testObj,
+                                        exception      => $e,
+                                        stage          => $POST);
+                # Iterate through all the hooks and execute their code blocks
+                $self->runHooks('afterPostTest');
+            }
+            else{
+                # Iterate through all the hooks and execute their code blocks
+                $self->runHooks('afterPostTest');
+                my $status = $testObj->getStatus();
+                if ($status =~ /fail/i){
+                    if ($mainPassed){
+                        $self->_handleException(test_object     => $testObj,
+                                                exception       => "Hook fail",
+                                                failed_hook_point => 'afterPostTest',
+                                                stage           => $POST);
+                    }
+                    else {
+                        # This covers the rare scenario where the MAIN FAILED
+                        #  but the post testCase or the afterPostTest hook also
+                        #  failed and additionally told the controller to set the
+                        #  stopOnError to 1 (We can only ever get here if stopOnError = 0 and 
+                        #  the thing after the main() set it to 1).
+                        #  Some cases do this so we need to handle them.
+                        #  What we do here is report to TMS and die
+                        if($gStopOnError) {
+                            $self->reportResultsToUtms($testObj);
+                            die "Hook failed and set the stop on error to true";
+                        }
+                    }   
+                }
+                else{
+                    $status{'status'}{'post_status'} = $PASS;
+                    $status{'status'}{'duration'} = (time() - $self->{start_time}) . 'S';
+                    $self->writeStatus(%status);
+                    delete $status{'status'};
+                }
+            }
+            $status{'status'}{'current_stage'} = $DONE;
+            $self->writeStatus(%status);
+            $self->reportResultsToUtms($testObj);
+            
+        }#end-of-else(test-case object)
+        #stop_on_error=0, create log rotation links in main rollup and the last
+        #rotated file, as the test object would end over here, either
+        #passed or failed.
+        Automatos::AutoLog->createLogRotationLink();
+    }#end-of-forloop
+    $self->{currently_running} = undef;
+}
+
+
+
+=begin nd
+
+Method: createTestLogFile
+Creates the test log file.
+
+Input:
+$tc_name  => $ A string specifying the test name.
+
+Returns:
+$testLogFile - A string specifying the test log file.
+For example:
+C:/logs/2011_Aug_15_15-40-32/TestCases/TC_1_2011_08_15_15-47-43.html
+
+Exceptions:
+- <Automatos::Exception::InvalidParam>
+
+=cut
+
+sub createTestLogFile
+{
+    my ($self) = shift(@_);
+    my ($tc_name) = validate_pos(@_, {type => SCALAR});
+
+    my @locnSegments;
+    #Replace '/'and '\' with '_' to avoid creating incorrect file path for
+    #test log file
+    $tc_name =~ s@/|\\@_@ig;
+    push(@locnSegments, $tc_name);
+    push(@locnSegments, getTimeStamp());
+
+    my $counter = $self->_incrementTestCounter();
+    my $testSetObj = $self->getTestSet();
+    my $testDir = File::Spec->catdir($testSetObj->getTestSetDir(), 'TestCases');
+    make_path($testDir);
+
+    my $tcFile = File::Spec->catfile($testDir,
+                                     join('_', @locnSegments, $counter) .
+                                          '---0.html');
+    return $tcFile;
+}
+
+
+=begin nd
+
+Method: getTimeStamp
+Returns the current time stamp in the format YYYY_MM_DD_HH-MM-SS.
+ex: 2011_Aug_15-12-28-45.
+
+Input:
+*None*
+
+Returns:
+$timeStamp - A sting specifying the current time in the format
+YYYY_MM_DD_HH-MM-SS.
+
+Exceptions:
+*None*
+
+=cut
+
+sub getTimeStamp
+{
+    my ($self) = shift(@_);
+    return strftime("%Y_%m_%d_%H-%M-%S",localtime(time()));
+}
+
+=begin nd
+
+Method: updateStatus
+Updates the json array that maintains the status count of the tests that
+have the status as pass/fail/configError/notrun in a particular test run. This
+is done at the end of every test. This json array is used to update the
+html scorecard table and the graph in main rollup html log file.
+
+Input:
+*None*
+
+Returns:
+*None*
+
+Exceptions:
+*None*
+
+=cut
+
+sub updateStatus
+{
+    my ($self) = shift(@_);
+    my $total = 0;
+    my $notRun = 0;
+    my $pass = 0;
+    my $fail = 0;
+    my $configError = 0;
+    my $running = 0;
+    my @tests = $self->getTestSet()->getTests();
+
+    foreach my $testObj (@tests) {
+        if ($testObj->isa("Automatos::Test::Case")) {
+            if ($testObj->getStatus() =~ m/^NotRun$/i) {
+                $notRun++;
+            }
+            elsif ($testObj->getStatus() =~ m/^Pass$/i) {
+                $pass++;
+            }
+            elsif ($testObj->getStatus() =~ m/^Fail$/i) {
+                $fail++;
+            }
+            elsif ($testObj->getStatus() =~ m/^ConfigError$/i) {
+                $configError++;
+            }
+            elsif ($testObj->getStatus() =~ m/^Running$/i) {
+                $running++;
+            }
+        }
+    }
+    $total = $notRun + $pass + $fail + $configError + $running;
+
+    my $dir = Automatos::AutoLog->getLogDir();
+    open (SF, ">$dir/Status.js") or die "Cannot open Status file";
+
+    print SF "var stats = [$total,$pass,$fail,$configError,$notRun];\n\n";
+    print SF "var testData = [{label: \"Pass\", data: $pass, color: \"green\"},".
+             "{label: \"Fail\", data: $fail, color: \"red\"},".
+             "{label: \"Config Error\", data: $configError, color: \"blue\"},".
+             "{label: \"Not Run\", data: $notRun, color: \"yellow\"}];";
+
+    close SF;
+}
+
+=begin nd
+
+Method: preTestSet
+Performs all actions required at the start of the test set i.e. before
+starting the execution of first test in the set.
+
+Input:
+*None*
+
+Returns:
+*None*
+
+Exceptions:
+*None*
+
+=cut
+
+sub preTestSet
+{
+    my ($self) = shift(@_);
+
+    my %yamlStatus;
+    my $testSetObj = $self->getTestSet();
+    my $name = $testSetObj->getName();
+    my $id = $testSetObj->getIdentity(id_type => 'ax_id');
+    $yamlStatus{'what'} = $TEST_SET;
+    $yamlStatus{'name'} = $name if (defined $name);
+    $yamlStatus{'id'} = $id if (defined $id);
+    $yamlStatus{'status'}{'current_stage'} = $PRE;
+    $yamlStatus{'status'}{'currently_running_test'} = $PRE_TEST_SET;
+    eval {
+        # Step 1: mark the begining of pre test set
+        $gLog->tsPre('Pre-Test-Set.');
+        my ($test) = $self->getTestSet()->getTests();
+        my $rsrc = $test->getResource();
+        my %device = $rsrc->getDevice();
+        foreach my $deviceType (keys %device) {
+            my $type = ucfirst(lc($deviceType));
+            foreach my $device (@{$device{$deviceType}}) {
+                if ($device->can('getUnifiedBuildId')) {
+                    eval{
+                        # Throw this inside its own eval because the device
+                        #  might not be up in all situations
+                        my $name = $device->getName();
+                        my $ver = $device->getUnifiedBuildId();
+                        if( defined($name) && defined($ver) ) {
+                            $gLog->info("$type device $name is running Unified Build "
+                                        . $ver);
+                        }
+                    };
+                    if($@) {
+                        $gLog->warn("Unable to get the unified build id because of a problem " .
+                                    "running the wrapper. This may be normal if the test is " .
+                                    "supposed to start on uninitialized hardware");   
+                    }
+                }
+            }
+        }
+
+        # Iterate through all the hooks and execute their preTestSet code block
+        $self->runHooks('preTestSet');
+    };
+    if(my $e = Exception::Class->caught()) {
+        my $msg = ref($e) ? $e->full_message() : $e;
+        $yamlStatus{'status'}{'pre_status'} = $FAIL;
+        $self->writeStatus(%yamlStatus);
+        $self->setTestSetError(1);
+        $gLog->preTsFail("Pre-Test-Set failed because of the following " .
+                         "error: " . $msg);
+        $gLog->trace("$e");
+
+        #Regardless of stop on error, failure in pre-test-set is fatal.
+        $self->postTestSet();
+        die $e;
+    }
+    else {
+        $yamlStatus{'status'}{'pre_status'} = $PASS;
+        $self->writeStatus(%yamlStatus);
+    }
+    return;
+}
+
+
+
+=begin nd
+
+Method: postTestSet
+Performs all actions required after all the tests have been executed.
+
+Input:
+*None*
+
+Returns:
+*None*
+
+Exceptions:
+*None*
+
+=cut
+
+sub postTestSet
+{
+    my ($self) = shift(@_);
+    
+    my %yamlStatus;
+    my $testSetObj = $self->getTestSet();
+    my $testSetDir = $testSetObj->getTestSetDir();
+    
+    my $name = $testSetObj->getName();
+    my $id = $testSetObj->getIdentity(id_type => 'ax_id');
+    $yamlStatus{'what'} = $TEST_SET;
+    $yamlStatus{'name'} = $name if (defined $name);
+    $yamlStatus{'id'} = $id if (defined $id);
+    $yamlStatus{'status'}{'current_stage'} = $POST;
+    $yamlStatus{'status'}{'currently_running_test'} = $POST_TEST_SET;
+    $yamlStatus{'status'}{'duration'} = (time() - $self->{test_set_start_time}) . 'S';
+    #the testset status is deemed incomplete only if an error occurred in
+    #the testset and $gStopOnError = 1. If $gStopOnError = 0, then
+    #postTestSet() would have been executed after every test in the testset
+    #had been executed, and not abruptly from between the testset. Thus we
+    #need to check $gStopOnError and whether an error occurred in the testset
+    #to decide the final status of testset.
+    if ($self->isTestSetError() && $gStopOnError) {
+        $testSetObj->setStatus($Automatos::Test::Base::INCOMPLETE);
+        $yamlStatus{'status'}{'main_status'} = $INCOMPLETE;
+        Automatos::AutoLog->createLogRotationLink();
+    }
+    else {
+        $testSetObj->setStatus($Automatos::Test::Base::COMPLETE);
+        $yamlStatus{'status'}{'main_status'} = $COMPLETE;
+    }
+
+    # Step 1: write the status changesto status.yml
+    $self->writeStatus(%yamlStatus);
+
+    eval {
+        # Step 2: Change the log file path
+        my $logFilePath = File::Spec->catfile($testSetDir, 'Post_TestSet---0.html');
+        Automatos::AutoLog->changeDetailLogFile(new_file => $logFilePath);
+        Automatos::AutoLog->setDetailFilePath($logFilePath);
+
+        # Step 3: Mark the begining of post test set
+        $gLog->tsPost('Post-Test-Set.');
+
+        # Step 4: Call any triage cleanup actions
+        $testSetObj->runPostTestSetActions();
+
+        # Step 5: Set the html footer for the main rollup html log file
+        Automatos::AutoLog->setFooterText($MAIN);
+
+        # Iterate through all the hooks and execute their postTestSet code block
+        $self->runHooks('postTestSet');
+    };
+    if(my $e = Exception::Class->caught()) {
+        my $msg = ref($e) ? $e->full_message() : $e;
+        $yamlStatus{'status'}{'current_stage'} = $DONE;
+        $yamlStatus{'status'}{'post_status'} = $FAIL;
+        $yamlStatus{'status'}{'currently_running_test'} = $DONE_TEST_SET;
+        $self->writeStatus(%yamlStatus);
+        $gLog->postTsFail("Post-Test-Set failed because of the following " .
+                          "error: " . $msg);
+        $gLog->trace("$e");
+    }
+    else {
+        # write the status changes to status.yml
+        $yamlStatus{'status'}{'current_stage'} = $DONE;
+        $yamlStatus{'status'}{'post_status'} = $PASS;
+        $yamlStatus{'status'}{'currently_running_test'} = $DONE_TEST_SET;
+        $self->writeStatus(%yamlStatus);
+    }
+    #post test set will end over here. Hence links need to be created in the
+    #last rotated log file and main rollup.
+    Automatos::AutoLog->createLogRotationLink();
+    $self->{post_test_set_executed} = 1;
+    return;
+}
+
+
+=begin nd
+
+Method: getTestSet
+Gets the TestSet object, which contains all the tests.
+
+Input:
+*None*
+
+Returns:
+The TestSet Object <Automatos::Test::Set>
+
+Exceptions:
+*None*
+
+=cut
+
+sub getTestSet
+{
+    my ($self) = shift(@_);
+    return $self->{testset};
+}
+
+=begin nd
+
+Method: getCurrentlyRunningTest
+Gets the currently running test object
+
+Input:
+*None*
+
+Returns:
+The Test Object <Automatos::Test> that the controller is currently running or
+undef, if not running a test
+
+Exceptions:
+*None*
+
+=cut
+
+sub getCurrentlyRunningTest
+{
+    my ($self) = shift(@_);
+    return $self->{currently_running};
+}
+
+=begin nd
+
+Method: isTestSetError
+Verifies whether an error occurred in the testset.
+
+Input:
+*None*
+
+Returns:
+$error - A boolean specifying the value for testset_error
+
+Exceptions:
+*None*
+
+=cut
+
+sub isTestSetError
+{
+    my ($self) = shift(@_);
+    return $self->{testset_error};
+}
+
+=begin nd
+
+Method: setTestSetError
+Sets the testset_error to the specified value. Valid values: (0|1).
+
+Input:
+$error - A boolean specifying the value to be set for testset_error.
+
+Returns:
+*None*
+
+Exceptions:
+- <Automatos::Exception::InvalidParam>
+
+=cut
+
+sub setTestSetError
+{
+    my ($self) = shift(@_);
+    my ($error) = validate_pos(@_,{type => BOOLEAN});
+    $self->{testset_error} = $error;
+    return;
+}
+
+=begin nd
+
+Method: setUtmsReporter
+Sets the <AutomatosX::UtmsReporter> object
+
+Input:
+$utmsRepObj - An <AutomatosX::UtmsReporter> object
+
+Returns:
+*None*
+
+Exceptions:
+- <Automatos::Exception::InvalidParam>
+
+=cut
+
+sub setUtmsReporter
+{
+    my ($self) = shift(@_);
+    my ($utmsRepObj) = validate_pos(@_,{isa => 'AutomatosX::UtmsReporter'});
+    $self->{'utms_reporter'} = $utmsRepObj;
+    return;
+}
+
+=begin nd
+
+Method: getUtmsReporter
+Provides an <AutomatosX::UtmsReporter> object.
+
+Input:
+*None*
+
+Returns:
+An <AutomatosX::UtmsReporter> object or undef
+
+Exceptions:
+*None*
+
+=cut
+
+sub getUtmsReporter
+{
+    my ($self) = shift(@_);
+
+    if (exists $self->{'utms_reporter'} && defined $self->{'utms_reporter'}) {
+        return $self->{'utms_reporter'};
+    }
+    return;
+}
+
+=begin nd
+
+Method: createExecutionParameters
+Creates and initializes execution parameters, which apply to the entire
+test execution.
+
+Input:
+exe_params => \@ - Array reference of the test set param values.
+
+Returns:
+*None*
+
+Exceptions:
+- <Automatos::Exception::InvalidParam>
+
+=cut
+
+sub createExecutionParameters
+{
+    my $self = shift(@_);
+    my %params = validate(@_,
+                            {
+                               exe_params => {type => ARRAYREF}
+                            });
+
+    #STOP_ON_ERROR
+    $self->addExecutionParameter(
+                        name             => 'stop_on_error',
+                        description      => 'If set to a true value, it will '.
+                                            'stop execution of all the tests '.
+                                            'in the test set when an error '.
+                                            'is encountered.',
+                        default          => 1,
+                        type             => 'BOOLEAN',
+                        display_name     => 'Stop on Error',
+                       );
+    #LOGGING_LEVEL
+    $self->addExecutionParameter(
+                        name            => 'logging_level',
+                        description      => 'Logging level for the messages to '.
+                                           'be displayed on the screen',
+                        default         => 'INFO',
+                        validation      => {
+                                             valid_values => ['TRACE','DEBUG',
+                                                  'CMD','INFO','WARN','ERROR',
+                                                  'STATUS','FATAL','OFF'],
+                                           },
+                        type            => 'SINGLE_SELECT',
+                        display_name    => 'Logging Level',
+                       );
+
+    #LOG_ROTATION_SIZE
+    $self->addExecutionParameter(
+                        name            => 'log_rotation_size',
+                        description      => 'The size threshold for the log files'.
+                                           'beyond which the log files are rotated',
+                        default         => '60 MB',
+                        type            => 'SIZE',
+                        display_name    => 'Log Rotation Size',
+                       );
+
+    #MAX_LOG_SIZE
+    $self->addExecutionParameter(
+                        name            => 'max_log_size',
+                        description      => 'The max size of the log files for a case',
+                        default         => '-1 MB',
+                        type            => 'SIZE',
+                        display_name    => 'Max Log Size',
+                       );
+
+    #STOP_ON_CONIFG_ERROR
+    #stop_on_config_error can be set in the main config xml file.
+    #it will act as the test set level value (can be override by test config)
+    $self->addExecutionParameter(
+                        name             => 'stop_on_config_error',
+                        description      => 'If set to a true value, it will '.
+                                            'stop execution of all the tests '.
+                                            'in the test set when an error '.
+                                            'is encountered.',
+                        default          => 0,
+                        type             => 'BOOLEAN',
+                        display_name     => 'Stop on Config Error',
+                       );
+
+    #corp_email
+    #set for automatic AR filing capability
+    $self->addExecutionParameter(
+                        name             => 'corp_email',
+                        description      => 'Your corporate E-Mail address.' ,
+                        optional         => 1,
+                        type             => 'TEXT',
+                        display_name     => 'Corporate E-Mail',
+                       );
+
+    #corp_username
+    #set for automatic AR filing capability
+    $self->addExecutionParameter(
+                        name             => 'corp_username',
+                        description      => 'Your corporate username' ,
+                        optional         => 1,
+                        type             => 'TEXT',
+                        display_name     => 'Corp Username',
+                       );
+
+    #corp_full_name
+    #set for automatic AR filing capability
+    $self->addExecutionParameter(
+                        name             => 'corp_full_name',
+                        description      => 'Your full name in the format ' .
+                                            'LastName, FirstName' ,
+                        optional         => 1,
+                        type             => 'TEXT',
+                        display_name     => 'Corp Full Name',
+                       );
+    
+    #MONITOR_INTERVAL
+    $self->addExecutionParameter(
+                        name             => 'monitor_interval',
+                        description      => 'The interval in Automatos time unit '.
+                                            'to specify how often to get the monitor sample',
+                        default          => '0 S',
+                        type             => 'time',
+                        display_name     => 'Monitor Interval',
+                       );
+    
+    # Iterate through the default list of parameters generated by the
+    # Controller. If the user supplied a different value for the parameter
+    # than the default, update the parameter to reflect the user's settings.
+    my @defaultExeParams = $self->getExecutionParameterObjects();
+    my @userExeParams    = @{$params{exe_params}};
+    my $hasInvalidParam  = 0;
+    PARAMOBJ: foreach my $paramObj (@defaultExeParams)
+    {
+        my $name = $paramObj->getName();
+        # Check to see if it was passed in by the user, from the XML
+        foreach my $param (@userExeParams) {
+            if($param->{name} =~ /$name/i) {
+                # We have a match, the user specified a value for this param
+                eval{ $paramObj->setValue($param->{value}); };
+                if(Automatos::Exception::InvalidParam->caught()) {
+                    # we will catch these here so we can go through all
+                    # parameters and let them know all that are invalid.
+                    $gLog->error("Execution Parameter $name has been set to ".
+                                 "an invalid value ($param->{value})");
+                    $hasInvalidParam = 1;
+                }
+                next PARAMOBJ;
+            }
+        }
+        # If we get here, then the param was not found in the user
+        # defined array, so we need to check to see if its optional
+        # or has a default value and if not, throw an exception.
+        if(!defined($paramObj->getValue()) && !$paramObj->isOptional()) {
+            $hasInvalidParam = 1;
+            $gLog->error("A value for Execution Parameter $name " .
+                         'must be specified.');
+        }
+    }
+
+    if($hasInvalidParam == 1) {
+        #one or more parameters have invalid value.
+        Automatos::Exception::InvalidParam->throw('One or more parameters are '.
+                                                  'invalid, please check log '.
+                                                  'for more information.');
+    }
+}
+
+
+=begin nd
+
+Method: addExecutionParameter
+Creates an execution parameter object and uses it within the test harness.
+
+Input:
+A reference to an hash of the param name/values.
+
+name         => $  - Name of the parameter
+description  => $  - *Optional* Parameter description explaining how it is used.
+default      => $  - *Optional* Default value for this parameter.
+validation   => $  - *Optional* Validation for this parameter, can be a range,
+                     specific values, regex, etc.
+type         => $  - *Optional* What type of parameter this is, can be INTEGER,
+                     BOOLEAN, MULTI_SELECT, SINGLE_SELECT, STRING, IPADDRESS.
+display_name => $  - *Optional* String the represents the user viewable name
+                     of the property. Will be used for GUI
+base         => \% - *Optional* hash reference that represents predefined
+                     parameters.  If this is defined, then these values will
+                     overwrite the other attributes passed in.
+optional     => $  - *Optional* A boolean specifying whether the Parameter is
+                     optional. If not present then, it will be perceived as a
+                     mandatory parameter. (1 - optional | 0 - Mandatory)
+
+Returns:
+None.
+
+Exceptions:
+- <Automatos::Exception::InvalidParam>
+
+=cut
+
+sub addExecutionParameter
+{
+    my $self= shift(@_);
+
+    my %params = validate_with(
+                     params      => \@_,
+                     spec        => {base => {type => HASHREF, optional => 1}},
+                     allow_extra => 1);
+
+    if(defined($params{base})) {
+        # This is used when common parameters are used.  The test developer
+        # must get the hash from the predefined parameter in the Database,
+        # then overwrite the attributes with the user values.
+        %params = (%{$params{base}}, %params);
+    }
+
+    # Need to create the correct parameter object
+    my $paramObj = Automatos::Parameter::create(%params);
+
+    # Add the parameter object to this test
+    push @{$self->{exe_parameters}}, $paramObj;
+}
+
+
+=begin nd
+
+Method: getExecutionParameterObjects
+Gets all the parameter objects relating to the execution environment.
+
+Input:
+Nothing
+
+Returns:
+A list of <Automatos::Parameter> objects.
+
+Exceptions:
+None
+
+=cut
+
+sub getExecutionParameterObjects
+{
+    my $self= shift(@_);
+    return @{$self->{exe_parameters}};
+}
+
+=begin nd
+
+Method: writeStatus
+Writes status update to the status log, if the log file is open.
+
+Input:
+Hash of the following parameters
+
+what => $ - A string specifying What is being updated:
+            'test_set', 'test_config', 'test_case'.
+
+name => $ - *Optional* A string specifying name of the test set, test case or
+            configuration
+
+id   => $ - *Optional* A string specifying id of the test set, test case or
+            configuration
+
+status => \% - A hashref specifying status of the test set, test case or
+               configuration:
+(start code)
+    current_stage => $ - *Optional* A string specifying the current stage of
+                         test_case, test_set or test_config. Valid values for
+                         test_case and test_set are:'init', 'pre', 'main',
+                         'post', 'done'. Valid values for test_config are:
+                         'init', 'main', 'done'.
+
+    pre_status =>     $ - *Optional* A string specifying whether the pre of
+                          the test_case, test_set passed or failed. It is
+                          valid only for test_case and test_set. Valid values
+                          are: 'pass', 'fail'.
+
+    main_status =>    $ - *Optional* A string specifying whether the pre of
+                          the test_case, test_set, test_config passed or
+                          failed. Valid values are: 'pass', 'fail',
+                          'config_error'.
+
+    post_status =>    $ - *Optional* A string specifying whether the post of
+                          the test_case passed or failed. It is valid only
+                          for test_case and test_set. Valid values are:
+                          'pass', 'fail'.
+
+    currently_running_test => $ - *Optional* A string specifying the name of
+                              the test that is currently under execution.
+                              It is valid only for test_set. Valid values
+                              are: '', '-InitTestSet-', '-PreTestSet-',
+                              '<string representing test name>'
+
+    duration => $ - *Optional* Automatos size string specifying how long this
+                    test has been running for
+
+    last_step_logged => $ - *Optional* A string specifying the last step that
+                            has been logged in the test
+(end)
+
+Returns:
+*None*
+
+Exceptions:
+*None*
+
+=cut
+
+sub writeStatus
+{
+    my ($self) = shift(@_);
+
+    if (exists $self->{status_log}) {
+        my %status = validate(@_, {
+            what => { type => SCALAR },
+            name => { type => SCALAR, optional => 1},
+            id => { type => SCALAR, optional => 1},
+            status => { type => HASHREF},
+        });
+        #validating the status hash
+        my @check = ($status{'status'});
+        validate(@check, {
+            current_stage           => {type => SCALAR, optional => 1},
+            pre_status              => {type => SCALAR, optional => 1},
+            main_status             => {type => SCALAR, optional => 1},
+            post_status             => {type => SCALAR, optional => 1},
+            currently_running_test  =>{type => SCALAR, optional => 1},
+            duration                => { callbacks => {'size'=>timeUnit()}, optional => 1 },
+            last_step_logged        => {type => SCALAR, optional => 1},
+            process_id              => {type => SCALAR, optional => 1},
+            program_name            => {type => SCALAR, optional => 1},
+        });
+        #adding time_stamp
+        $status{when} = $self->getTimeStamp();
+        my $yamlContent = YAML::Any::Dump(\%status);
+        print {$self->{status_log}} "$yamlContent...\n";
+    }
+    return;
+}
+
+
+=begin nd
+
+Method: runHooks
+Runs all the hooks defined in the Test Set
+
+Input:
+$hookPoint - Name of the hook point to run
+
+Returns:
+*None*
+
+Exceptions:
+*None*
+
+=cut
+
+sub runHooks
+{
+    my ($self, $hookPoint) = @_;
+
+    # Iterate through all the hooks and execute their code for the requested hook point
+
+    my @hooks = $self->getTestSet()->getHooks();
+    foreach my $hook (@hooks) {
+        $gLog->info('### Running Hook [' . ref($hook) . '] for HookPoint (' . $hookPoint . ') ###');
+        eval {
+            $hook->$hookPoint();
+        };
+        if (my $e = Exception::Class->caught()) {
+            my $msg = ref($e) ? $e->full_message() : $e;
+            $gLog->warn('Hook ' . ref($hook) .
+                        " threw an exception but Automatos will continue.  Error:\n$msg");
+        }
+        $gLog->info('### Hook [' . ref($hook) . '] Completed running for HookPoint (' . $hookPoint . ') ###');
+    }
+
+}
+
+=begin nd
+
+Method: reportResultsToUtms
+Reports the test results to Utms
+
+Input:
+$testObj - an <Automatos::Test::Case> object
+
+Returns:
+*None*
+
+Exceptions:
+- <Automatos::Exception::InvalidParam>
+
+=cut
+
+sub reportResultsToUtms
+{
+    my ($self) = shift(@_);
+    my ($testObj) = validate_pos(@_, {isa => 'Automatos::Test::Case'});
+    my $utmsRepObj = $self->getUtmsReporter();
+
+    return if !$utmsRepObj; # We're done if there's no UTMS report object.
+
+    my $tmsDataExtractor = AutomatosX::TmsDataExtractor->new($testObj);
+    my $tmsDataModel     = $tmsDataExtractor->extractData($testObj->getStatus());
+
+    eval {
+        $utmsRepObj->postTestResult($tmsDataModel);
+    };
+    if (my $e = Exception::Class->caught()) {
+        my $msg;
+        if ((ref $e) && ($e->can('full_message'))) {
+            $msg = $e->full_message();
+        }
+        else {
+            $msg = $e;
+        }
+        my $testName = $testObj->getName();
+        $gLog->error("Error occurred while posting results " .
+                      "for $testName to UTMS.\n$msg");
+    }
+    return;
+}
+
+=begin
+
+Method: _incrementTestCounter
+Increments the current value of test_counter by 1 and returns the updated value
+
+Input:
+*None*
+
+Returns:
+A number representing the updated value of the test_counter
+
+Exceptions:
+*None*
+
+=cut
+
+sub _incrementTestCounter
+{
+    my ($self) = shift(@_);
+
+    return $self->{test_counter} += 1;
+}
+
+=begin
+
+Method: _getIdentityOfTest
+Gets the value of the requested identity for the requested test object
+
+Input:
+$test - An <Automatos::Test::Base> object
+$name - The name of the identity such as 'ax_id', 'utms_id', etc.
+        default value is ax_id.
+
+Returns:
+$id - The value of the requested identity OR undef
+
+Exceptions:
+*None*
+
+=cut
+
+sub _getIdentityOfTest
+{
+    my ($self) = shift(@_);
+    my ($test, $name) = validate_pos(@_,{isa => 'Automatos::Test::Base'},
+                                        {type => SCALAR, default => 'ax_id'});
+
+    if ($test->hasIdentity(name => $name)) {
+        $gLog->debug("Name of identity is: $name");
+        my @identities = $test->getIdentity(name => $name);
+        $gLog->debug("identities: " . Dumper(\@identities));
+        foreach my $identity (@identities) {
+            if ($identity->{'name'} eq $name) {
+                return $identity->{'value'};
+                last;
+            }
+        }
+    }
+    $gLog->trace("Identity $name does not exist for " . $test->getName());
+    return;
+}
+
+=begin
+
+Method: _selectDeviceForEngine
+select device object for engine use
+
+Input:
+$configObject - An <Automatos::Requirement::Configuration> object
+$testObj - An <Automatos::Test::Base> object
+
+Returns:
+$dev - An <Automatos::Device::Storage> object
+
+Exceptions:
+*None*
+
+=cut
+
+sub _selectDeviceForEngine
+{
+    my ($self, $configObject, $testObj) = @_;
+    my $rsrcObj = $testObj->getResource();
+    my $type = $configObject->{type};
+    my @devices;
+    if($type !~ m/^any$/i) {
+        @devices = $rsrcObj->getDevice(type => $type);
+    }
+    else {
+        my @devTypes = ('unified', 'file', 'block');
+        foreach my $devType (@devTypes) {
+            push @devices, $rsrcObj->getDevice(type => $devType);
+        }   
+    }
+    #choose the device without 'configured' tag to apply
+    #if there are more than two configuration hashes under same
+    #device type. Here will choose each device for each configuration
+    DEV: foreach my $dev (@devices){
+        if (exists($dev->{configured}) && $dev->{configured}){
+            next;
+        }
+        # Now make sure that the device can support all of the components requested
+        foreach my $component (keys (%{$configObject})) { 
+            if($component eq 'type' || $component eq 'config_id' 
+               || $component eq 'validate_and_heal') {
+                next; # This isn't a compoennt
+            }
+            my %map = $dev->_getComponentCreateMap();
+            #change all keys to low case because validate_with() in Requirement will convert
+            #all keys to low case. 
+            foreach my $k (keys%map){
+                $map{lc $k} = delete $map{$k};
+            }
+            if(!exists($map{$component})) {
+                next DEV;
+            }
+        }
+        
+        $dev->{configured} = 1;
+        
+        # If the test case assigned a config ID to this configuration mark it down
+        #  on the device so we can easily find the device in the test.
+        if(exists($configObject->{config_id})) {
+            $dev->{config_id} = $configObject->{config_id};
+        }
+        return $dev;
+    }
+
+    return;
+}
+
+=begin nd
+
+Method: getStopOnError
+Return the current value decides the behavior of controller when an error happens while running a test case.
+The value of true means the test set will stop running when an the error happens in a test case.
+
+Input:
+*None*
+
+Returns:
+$stopOnError - A boolean specifying the value for stop on test case error.
+
+Exceptions:
+*None*
+
+=cut
+
+sub getStopOnError()
+{
+    return $gStopOnError;
+}
+
+=begin nd
+
+Method: setStopOnError
+Set the value which decides the behavior of controller when an error happens while running a test case.
+The value of true means the test set will stop running when an the error happens in a test case.
+
+Input:
+$stopOnError - A boolean specifying the value for stop on test case error.
+
+Returns:
+*None*
+
+Exceptions:
+*None*
+
+=cut
+
+sub setStopOnError()
+{
+    my ($self) = shift(@_);
+    my ($value) = @_;
+    $gStopOnError = $value;
+}
+
+=begin nd
+
+Method: getStopOnConfigError
+Return the current value decides the behavior of controller when an error happens while running a test config.
+The value of true means the test set will stop running when an the error happens in a test config.
+
+Input:
+*None*
+
+Returns:
+$stopOnConfigError - A boolean specifying the value for stop on test config error.
+
+Exceptions:
+*None*
+
+=cut
+
+sub getStopOnConfigError()
+{
+    return $gConfigStopOnError;
+}
+
+=begin nd
+
+Method: setStopOnConfigError
+Set the value which decides the behavior of controller when an error happens while running a test config.
+The value of true means the test set will stop running when an the error happens in a test config.
+
+Input:
+$stopOnConfigError - A boolean specifying the value for stop on test config error.
+
+Returns:
+*None*
+
+Exceptions:
+*None*
+
+=cut
+
+sub setStopOnConfigError()
+{
+    my ($self) = shift(@_);
+    my ($value) = @_;
+    $gConfigStopOnError = $value;
+}
+
+=begin nd
+
+Method: getLogLevel
+Return the current log level.
+
+Input:
+*None*
+
+Returns:
+$logLevel - A string specifying the value of log level.
+
+Exceptions:
+*None*
+
+=cut
+
+sub getLogLevel()
+{
+    return $gLoggingLevel;
+}
+
+=begin nd
+
+Method: setLogLevel
+Set the log level. It also changes the log level of screen output.
+
+Input:
+$logLevel - A string specifying the value of log level.
+Valid value is one of 'TRACE','DEBUG','CMD','INFO','WARN','ERROR','STATUS','FATAL','OFF'.
+
+
+Returns:
+*None*
+
+Exceptions:
+*None*
+
+=cut
+
+sub setLogLevel()
+{
+    my ($self) = shift(@_);
+    my ($value) = @_;
+    Automatos::AutoLog->setScreenLogLevel($value);
+    $gLoggingLevel = $value;
+}
+
+=begin nd
+
+Method: startMonitor
+Start to monitor sp or cs CPU and process memory utilization
+
+Input:
+*None*
+
+
+Returns:
+*None*
+
+Exceptions:
+*None*
+
+=cut
+
+sub startMonitor 
+{
+    my $self = shift(@_);
+    
+    my $monitorIntervalInSeconds = getNumber(convertTime($gMonitorInterval, 'S'));
+    if($monitorIntervalInSeconds <= 0) {
+        return;
+    }
+    
+    my ($module) = $self->getTestSet()->getTests();
+    my @unifiedDev = $module->getResource()->getDevice(type => 'unified');
+    my @blockDev = $module->getResource()->getDevice(type => 'block');
+    my @fileDev = $module->getResource()->getDevice(type => 'file');
+    
+    my @ioHosts;
+    foreach my $ioHost ($module->getResource()->getDevice(type => 'host')) {
+        push @ioHosts, $ioHost;
+    }
+    
+    my @spHosts;
+    foreach my $dev (@unifiedDev, @blockDev) {
+        my @spComponents = $dev->getSp();
+        foreach my $sp (@spComponents) {
+            my $spHost;
+            eval {
+                $spHost = $sp->getHostObject();
+                1;
+            };
+            if(defined $spHost) {
+                push @spHosts, $spHost;
+            }
+        }
+    }
+    my @csHosts;
+    foreach my $dev (@fileDev) {
+        my @csComponents = $dev->getControlStation();
+        foreach my $cs (@csComponents) {
+            my $csHost;
+            eval {
+                $csHost = $cs->getHostObject();
+                1;
+            };
+            if(defined $csHost) {
+                push @csHosts, $csHost;
+            }
+        }
+    }
+    my $controllerHost;
+    if($self->isa('Automatos::Controller::Rats')) {
+        $controllerHost = Automatos::Device::Host->discover(type => 'local', monitor_processes => ['perl']);
+    }
+    
+    my @hosts = (@spHosts, @csHosts, @ioHosts);
+    push @hosts, $controllerHost if (defined $controllerHost);
+    if(@hosts) {
+        #Start to chart
+        my $thread = threads->new(sub { 
+                                        if(!$self->isa('Automatos::Controller::Rats')) {
+                                            $gLog->monitorLog('Host Monitor Log');
+                                        }
+                                        my $monitorFile = $self->createTestLogFile("HostMonitor");
+                                        Automatos::AutoLog->changeDetailLogFile(new_file => $monitorFile, 
+                                                                                close_table => 0);
+                                        Automatos::Util::HostMonitor::startMonitor(hosts => [@hosts],
+                                        sample_span => $gMonitorInterval);
+        });
+        $thread->detach();
+    }
+}
+
+=begin
+
+Method: _getDeviceInfoForUtms
+Gets build id and platform id of the device which will be used for
+reporting results to utms
+
+NOTE: This method is deprecated as it has been moved to TmsDataExtractor.
+It is included here because an external group has started to use it.
+
+The correct thing to do is to instantiate TmsDataExtractor and use the
+"extractData" method.  It will return an object with all known information
+about the execution.
+
+Input:
+See <AutomatosX::TmsDataExtractor::_getDeviceInfo>
+
+Returns:
+See <AutomatosX::TmsDataExtractor::_getDeviceInfo>
+
+Exceptions:
+*None*
+
+=cut
+
+sub _getDeviceInfoForUtms
+{
+    my ($self) = shift(@_);
+    my ($test) = shift(@_);
+
+    my $tmsDataExtractor = AutomatosX::TmsDataExtractor->new($test);
+    return $tmsDataExtractor->_getDeviceInfo();
+}
+
+
+1;
+
+

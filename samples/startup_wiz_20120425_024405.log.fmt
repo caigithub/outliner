@@ -1,0 +1,125 @@
+[com.emc.celerra.startup.wrapper.Main]: Closing File-input Stream in finally block for property file CPW_Language_Selection.properties
+[com.emc.celerra.startup.wrapper.Main]: Current Locale is : en
+[com.emc.celerra.startup.baseutil.i18n.MessageRetriever]: Setting the Locale : en
+[com.emc.celerra.startup.wrapper.Main]: CSA version 7.1.40.2
+[com.emc.celerra.startup.wrapper.FirstModule]: XML file(s) are present.
+[com.emc.celerra.startup.framework.WizController]:  validation code = 2
+[com.emc.celerra.startup.framework.WizController]: calling next() method
+		[com.emc.celerra.startup.repository.Repository]: XML filename (160_nopnp) doesn't describe the MAC correctly
+		[com.emc.celerra.startup.repository.Repository]: XML filename (160_pnp) doesn't describe the MAC correctly
+		[com.emc.celerra.startup.wrapper.FirstModule]:  Using repository from filename:CSA_160_pnp.xml
+		[com.emc.celerra.startup.framework.WizController]:  validation code = 2
+[com.emc.celerra.startup.framework.WizController]: calling next() method
+		[com.emc.celerra.startup.wrapper.PasswordPage]: Authentication tried using SSH for host : 10.244.212.160 was sucessful
+				[com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+				[com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+		[com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+		[com.emc.celerra.startup.wrapper.VersionUtil]: CSA version: 7.1.40.2
+		[com.emc.celerra.startup.wrapper.VersionUtil]: Exclude versions: 5.6.36,5.6.37,5.6.38
+		[com.emc.celerra.startup.wrapper.PasswordPage]: Recheck NAS version 7.1.30-2 on host 10.244.212.160 failed
+				[com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+				[com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+		[com.emc.celerra.startup.util.SSHConnection]: Return code is null
+		[com.emc.celerra.startup.util.SSHConnection]: Attempted to get return code ... 1 times
+				[com.emc.celerra.startup.util.SSHConnection]: start sleep for retcode
+				[com.emc.celerra.startup.util.SSHConnection]: end sleep for retcode
+		[com.emc.celerra.startup.util.SSHConnection]: Return code is null
+		[com.emc.celerra.startup.util.SSHConnection]: Attempted to get return code ... 2 times
+				[com.emc.celerra.startup.util.SSHConnection]: start sleep for retcode
+				[com.emc.celerra.startup.util.SSHConnection]: end sleep for retcode
+		[com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+				[com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+				[com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+		[com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+		[com.emc.celerra.startup.wrapper.PasswordPage]: Block Version -----:05.32.000.3.784
+		[com.emc.celerra.startup.framework.WizController]:  validation code = 4
+		[com.emc.celerra.startup.framework.WizController]:  validation code = 2
+[com.emc.celerra.startup.framework.WizController]: calling next() method
+		[com.emc.celerra.startup.framework.WizController]:  validation code = 2
+[com.emc.celerra.startup.framework.WizController]: calling next() method
+		[com.emc.celerra.startup.framework.WizController]:  validation code = 2
+[com.emc.celerra.startup.framework.WizController]: calling next() method
+		[com.emc.celerra.startup.framework.WizController]:  validation code = 2
+[com.emc.celerra.startup.framework.WizController]: calling next() method
+		[com.emc.celerra.startup.healthcheck.screens.WizHealthCheckForm]: prepare_full_check
+				[com.emc.celerra.startup.util.SSHConnection]: Attempting to Conneect to CS
+				[com.emc.celerra.startup.util.SSHConnection]: The correct xml file to be transferred is .\test\CSA_160_nopnp.xml
+				[com.emc.celerra.startup.util.SSHConnection]: Conneected if we got this far
+				[com.emc.celerra.startup.util.SSHConnection]: Attempting to authenticate using credentials
+				[com.emc.celerra.startup.util.SSHConnection]: Authenticated using credentials
+		[com.emc.celerra.startup.util.SSHConnection]: response returned: <?xml version="1.0"?>
+				<Celerra>
+				<CableCheckResponse>
+				<Component Name="Control Station 0 Linux Update" CCMD_ID="28186182232"/>
+				<Component Name="Management Module Setup" CCMD_ID="28186182233"/>
+				<Component Name="Cable Checks" CCMD_ID="28186182234"/>
+				<Component Name="Pre-blade Initialization Setup" CCMD_ID="28186182235"/>
+				<Component Name="Network Setup" CCMD_ID="28186182243"/>
+				<Component Name="System Communication Setup" CCMD_ID="28186182238"/>
+				<Component Name="Blade Initialization (may take up to 15 minutes)" CCMD_ID="28186182237"/>
+				<Component Name="Blade Configuration" CCMD_ID="28186182236"/>
+				<Component Name="System Configuration" CCMD_ID="28186182239"/>
+				<Component Name="System Communication Check" CCMD_ID="28186182240"/>
+				<Component Name="Control Station 1 Setup (optional; may take up to 30 minutes)" CCMD_ID="28186182245"/>
+				<Component Name="Final Tasks" CCMD_ID="28186182242"/>
+				</CableCheckResponse>
+				</Celerra>
+				[com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+				[com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+		[com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+		[com.emc.celerra.startup.healthcheck.screens.WizHealthCheckForm]: System check list returned: <?xml version="1.0"?>
+				<Celerra>
+				<CableCheckResponse>
+				<Component Name="Control Station 0 Linux Update" CCMD_ID="28186182232"/>
+				<Component Name="Management Module Setup" CCMD_ID="28186182233"/>
+				<Component Name="Cable Checks" CCMD_ID="28186182234"/>
+				<Component Name="Pre-blade Initialization Setup" CCMD_ID="28186182235"/>
+				<Component Name="Network Setup" CCMD_ID="28186182243"/>
+				<Component Name="System Communication Setup" CCMD_ID="28186182238"/>
+				<Component Name="Blade Initialization (may take up to 15 minutes)" CCMD_ID="28186182237"/>
+				<Component Name="Blade Configuration" CCMD_ID="28186182236"/>
+				<Component Name="System Configuration" CCMD_ID="28186182239"/>
+				<Component Name="System Communication Check" CCMD_ID="28186182240"/>
+				<Component Name="Control Station 1 Setup (optional; may take up to 30 minutes)" CCMD_ID="28186182245"/>
+				<Component Name="Final Tasks" CCMD_ID="28186182242"/>
+				</CableCheckResponse>
+				</Celerra>
+		[com.emc.celerra.startup.healthcheck.screens.WizHealthCheckForm]: _displaySystemCheckComponents: recheckVisited[false] isSuccessCheckDone[null]
+				[com.emc.celerra.startup.util.SSHConnection]: Attempting to Conneect to CS
+				[com.emc.celerra.startup.util.SSHConnection]: Log file does not exist in .\
+				[com.emc.celerra.startup.util.SSHConnection]: Conneected if we got this far
+				[com.emc.celerra.startup.util.SSHConnection]: Attempting to authenticate using credentials
+				[com.emc.celerra.startup.util.SSHConnection]: Authenticated using credentials
+		[com.emc.celerra.startup.util.SSHConnection]: response returned: <?xml version="1.0"?>
+				<Celerra>
+				<CableCheckResponse>
+				<Status Overall="Failed">
+				<Component Date="25-04-2012 08:16:20" LastUpdate="1335321980" Model="VNX5300" Name="Control Station 0 Linux Update" Percentage="1" Result="Err 15301541889" CCMD_ID="28186182232"/>
+				</Status>
+				</CableCheckResponse>
+				</Celerra>
+				[com.emc.celerra.startup.util.SSHConnection]: start sess.waitforCondition
+				[com.emc.celerra.startup.util.SSHConnection]: end sess.waitforCondition
+		[com.emc.celerra.startup.util.SSHConnection]: Return code is : 0
+		[com.emc.celerra.startup.healthcheck.util.XMLCom]: componentstatus <?xml version="1.0"?>
+				<Celerra>
+				<CableCheckResponse>
+				<Status Overall="Failed">
+				<Component Date="25-04-2012 08:16:20" LastUpdate="1335321980" Model="VNX5300" Name="Control Station 0 Linux Update" Percentage="1" Result="Err 15301541889" CCMD_ID="28186182232"/>
+				</Status>
+				</CableCheckResponse>
+				</Celerra>
+		[com.emc.celerra.startup.healthcheck.screens.WizHealthCheckForm]: Pre Display Status Control Station 0 Linux Update is: Err 15301541889
+		[com.emc.celerra.startup.healthcheck.screens.WizHealthCheckForm]: Model Type Info: VNX5300
+		[com.emc.celerra.startup.healthcheck.screens.WizHealthCheckForm]: Saving state of failed tasks for retry
+		[com.emc.celerra.startup.healthcheck.screens.WizHealthCheckForm]: Processing initial error status for Component: Control Station 0 Linux Update
+		[com.emc.celerra.startup.healthcheck.screens.WizHealthCheckForm]: DisplayStatus: Returning Status: Err 15301541889
+		[com.emc.celerra.startup.healthcheck.screens.WizHealthCheckForm]: Post Display Status Control Station 0 Linux Update is: Err 15301541889
+		[com.emc.celerra.startup.healthcheck.screens.WizHealthCheckForm]: Checking component overall status: 
+		[com.emc.celerra.startup.healthcheck.screens.WizHealthCheckForm]: Current check failed adding recheck button
+		[com.emc.celerra.startup.wrapper.Main]: Stopping module : com.emc.celerra.startup.wrapper.FirstModule@1fa10da
+		[com.emc.celerra.startup.wrapper.Main]: Stopping module : com.emc.celerra.startup.init.screens.WizInit@688e91
+		[com.emc.celerra.startup.wrapper.Main]: Stopping module : com.emc.celerra.startup.healthcheck.WizHealthCheck@67e236
+		[com.emc.celerra.startup.wrapper.Main]: Stopping module : com.emc.celerra.startup.configuration.ConfigModule@34600d
+		[com.emc.celerra.startup.wrapper.Main]: Stopping module : com.emc.celerra.startup.wrapper.LastModule@8e3115
+		[com.emc.celerra.startup.wrapper.Main]: Stopping module : com.emc.celerra.startup.cpwwiz.WizardModule@1386751

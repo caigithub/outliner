@@ -1,0 +1,9 @@
+try {
+} catch (CelerraException e) {
+    try {
+        SSHConnection.closeConnection(cutHost);
+    }
+} catch (NumberFormatException e1) {
+    // not ccmd message
+}
+

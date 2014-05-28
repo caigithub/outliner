@@ -1,0 +1,8 @@
+<root>
+  <rule content="aaa" IndentInBefore="true" IndentOutBefore="false" IndentInAfter="false" IndentOutAfter="false"/>
+  <rule content="bbb" IndentInBefore="false" IndentOutBefore="true" IndentInAfter="false" IndentOutAfter="false"/>
+  <rule content="ccc" IndentInBefore="false" IndentOutBefore="false" IndentInAfter="true" IndentOutAfter="false"/>
+  <rule content="ddd" IndentInBefore="false" IndentOutBefore="false" IndentInAfter="false" IndentOutAfter="true"/>
+</root>
+
+

@@ -1,0 +1,16 @@
+aaa
+{
+import com.emc.navisphere.gui.common.utilities.NaviToolException;
+        
+    aaa
+    aaa
+    bbb
+    bbb
+    {
+        aaa
+        aaa
+        bbb
+        bbb   
+    }
+}
+
