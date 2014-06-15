@@ -60,6 +60,30 @@ namespace outliner
             }
         }
 
+        private int _contextSize = 3;
+        public int contextSize
+        {
+            get {
+                return _contextSize;
+            }
+
+            set {
+                _contextSize = value;
+            }
+        }
+
+        private bool _enableContextConstrain = true;
+        public bool enableContextConstrain
+        {
+            get {
+                return _enableContextConstrain;
+            }
+
+            set {
+                _enableContextConstrain = value;
+            }
+        }
+
         public bool restrcutre(Content n, Content output)
         {
             if (n == null || output == null)
@@ -68,14 +92,12 @@ namespace outliner
             }
 
             bool found_in_child = false;
-            foreach (Content c in n.Chidren)
+            if (enableContextConstrain == true)
             {
-                Content new_c = new Content();
-                if (restrcutre(c, new_c) == true)
-                {
-                    found_in_child = true;
-                }
-                output.addChild(new_c);
+                found_in_child = handleChildrenWithContextConstrain(n, output);
+            }
+            else {
+                found_in_child = handleChildrenWithAllContext(n, output);
             }
 
             output.Name = n.Name;
@@ -95,8 +117,63 @@ namespace outliner
             return false;
         }
 
-        //====================================
+        private bool handleChildrenWithAllContext(Content n, Content output) {
+            bool found_in_child = false;
 
+            foreach (Content c in n.Chidren)
+            {
+                Content new_c = new Content();
+                if (restrcutre(c, new_c) == true)
+                {
+                    found_in_child = true;
+                }
+                
+                output.addChild(new_c);
+            }
+
+            return found_in_child;
+        }
+
+        private bool handleChildrenWithContextConstrain(Content n, Content output)
+        {
+            bool found_in_child = false;
+
+            FixedSizeQueue<Content> previouseContextContent = new FixedSizeQueue<Content>(contextSize);
+            int postConextContentCount = 0;
+
+            foreach (Content c in n.Chidren)
+            {
+                Content new_c = new Content();
+                if (restrcutre(c, new_c) == true)
+                {
+                    while (previouseContextContent.Count > 0)
+                    {
+                        output.addChild(previouseContextContent.Dequeue());
+                    }
+                    output.addChild(new_c);
+
+                    postConextContentCount = contextSize;
+
+                    found_in_child = true;
+                }
+                else
+                {
+                    if (postConextContentCount > 0)
+                    {
+                        output.addChild(new_c);
+                        postConextContentCount--;
+                    }
+                    else
+                    {
+                        previouseContextContent.Enqueue(new_c);
+                    }
+                }
+            }
+
+            return found_in_child;
+        }
+        //====================================
+    
         public void info()
         {
             if (_filter == null)
@@ -110,45 +187,81 @@ namespace outliner
         }
 
         //====================================
-
+    
         public void test()
         {
             Tester.info(this.GetType());
 
-            simpleTest("fuc", "", 0);
-            simpleTest("roo", "root", 0);
 
-            simpleTest("aa", "root", 1);
-            simpleTest("bb", "root", 1);
-            simpleTest("child", "root", 2);
+            this.enableContextConstrain = true;
+            this.contextSize = 3;
+            checkQuickFilterResult("aa", 2, 0);
+            checkQuickFilterResult("_0", 2, 4);
+            checkQuickFilterResult("_1", 2, 5);
+            checkQuickFilterResult("_2", 2, 6);
+            checkQuickFilterResult("_3", 2, 7);
+            checkQuickFilterResult("_4", 2, 7);
+            checkQuickFilterResult("_5", 2, 7);
+            checkQuickFilterResult("_6", 2, 6);
+            checkQuickFilterResult("_7", 2, 5);
+            checkQuickFilterResult("_8", 2, 4);
 
-            simpleTest("", "root", 2);
-            simpleTest(" ", "root", 2);
+            this.enableContextConstrain = false;
+            this.contextSize = 7;
+            checkQuickFilterResult("aa", 2, 9); 
+            checkQuickFilterResult("_8", 2, 9);
         }
 
-        private void simpleTest(string filterString, string rootName, int childerNumber)
+        private void checkQuickFilterResult(string filterString, 
+                                            int expected_childerNumber,
+                                            int expected_chidlrenChildrenNumber)
         {
             this.filter = new TextFilter(filterString);
             Content output = new Content();
             restrcutre(sample(), output);
-            Tester.check(rootName, output.Name, filterString + " - root name");
-            Tester.check(childerNumber, output.Chidren.Count, filterString + " - children count");
+
+
+            Tester.check(expected_childerNumber, output.Chidren.Count, filterString + " - children count");
+            Tester.check(expected_chidlrenChildrenNumber, output.Chidren[0].Chidren.Count, filterString + " - children children count");
         }
 
         private Content sample()
         {
+            // root
+            //      aa
+            //          aa_child_1
+            //          aa_child_2
+            //          ....
+            //          aa_child_9
+            //      bb
+            //          bb_child_1
+            //          bb_child_2
+            //          ....
+            //          bb_child_9
+            
             Content root = new Content();
             root.Name = "root";
 
-            Content f_child = new Content();
-            f_child.Name = "aa_child";
-            root.addChild(f_child);
-
-            Content s_child = new Content();
-            s_child.Name = "bb_child";
-            root.addChild(s_child);
+            root.addChild( sampleContents("aa", 9));
+            root.addChild(sampleContents("bb", 9));
 
             return root;
         }
+
+        private Content sampleContents( string name , int child_number )
+        {
+            Content first = new Content();
+            first.Name = name;
+
+            for (int i = 0; i < child_number;  i++)
+            {
+                Content new_child = new Content();
+                new_child.Name = "child_" + i.ToString();
+                first.addChild(new_child);
+            }
+
+            return first;
+        }
+        
     }
 }

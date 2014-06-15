@@ -15,7 +15,7 @@ namespace outliner
         {
             new ScopeDefinition().test();
             new TextFilter().test();
-
+            new FixedSizeQueue<Content>(3).test();
             new ContentRestructor().test();
 
             Application.EnableVisualStyles();

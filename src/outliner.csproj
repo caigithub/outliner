@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="content\FixedSizeQueue.cs" />
     <Compile Include="content\TextFilter.cs" />
     <Compile Include="scope\ScopeAnazlyzer.cs" />
     <Compile Include="common\Tester.cs" />

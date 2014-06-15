@@ -37,7 +37,7 @@ namespace outliner
 
         private void filter_click(object sender, EventArgs e)
         {
-            ApplyFilter(_key.Text);
+            refresh();
         }
 
         private void Form1_DragEnter(object sender, DragEventArgs e)
@@ -51,19 +51,19 @@ namespace outliner
 
             ApplySourceFile(files[0]);
         }
+
+        private void _enableContext_CheckedChanged(object sender, EventArgs e)
+        {
+            this._contextSize.Enabled = this._enableContext.Checked;
+            refresh();
+        }
+
         //===========================
 
         private void ApplySourceFile(string file_name)
         {
             button2.Text = Path.GetFileName(file_name);
             _analyzed_content = _analyzer.analyze(File.ReadAllLines(file_name));
-
-            refresh();
-        }
-
-        private void ApplyFilter(string keyword)
-        {
-            _restructor.filter = new TextFilter(_key.Text);
 
             refresh();
         }
@@ -80,17 +80,20 @@ namespace outliner
 
         private void refresh()
         {
-            Content new_content = new Content();
+            _restructor.filter = new TextFilter(_key.Text);
+            _restructor.enableContextConstrain = _enableContext.Checked;
+            _restructor.contextSize = Decimal.ToInt32(_contextSize.Value);
 
+            Content new_content = new Content();
             if (_restructor.filter.isValid())
             {
-
                 _restructor.handler = new ui.HightlightSelectionFormat();
             }
             else
             {
                 _restructor.handler = new ui.BlankSelectionFormat();
             }
+
             _restructor.info();
             _restructor.restrcutre(_analyzed_content, new_content);
 
@@ -100,6 +103,6 @@ namespace outliner
             _tree_view.add(new_content);
         }
 
-
+        
     }
 }
