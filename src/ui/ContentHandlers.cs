@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 
 namespace outliner.ui
@@ -11,7 +12,7 @@ namespace outliner.ui
             content.putData( new ui.NodeHighlightFormatter(content.Name, f.filterReg) );
         }
 
-        public void handleFilteredcontent(Content content, TextFilter f)
+        public void handleContextContent(Content content, TextFilter f)
         {
             content.putData( new ui.NormalFormatter(content.Name));
         }
@@ -19,6 +20,10 @@ namespace outliner.ui
         public void handleSelectNodeParent(Content content, TextFilter f)
         {
             content.putData(new ui.PathHighlightFormatter(content.Name));
+        }
+
+        public void handleFilteredContent(Content content, TextFilter f) {
+            content.putData(new ui.NormalFormatter( Color.LightGray, content.Name));            
         }
     }
 
@@ -29,12 +34,17 @@ namespace outliner.ui
             doHandle(content);
         }
 
-        public void handleFilteredcontent(Content content, TextFilter f)
+        public void handleContextContent(Content content, TextFilter f)
         {
             doHandle(content);
         }
 
         public void handleSelectNodeParent(Content content, TextFilter f)
+        {
+            doHandle(content);
+        }
+
+        public void handleFilteredContent(Content content, TextFilter f)
         {
             doHandle(content);
         }

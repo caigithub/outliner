@@ -17,13 +17,16 @@ namespace outliner
             return _max_size;
         }
 
-        public new void Enqueue(T tb)
+        public new T Enqueue(T tb)
         {
             base.Enqueue(tb);
 
             if (this.Count > getMaxSize())
             {
-                this.Dequeue();
+                return this.Dequeue();
+            }
+            else {
+                return default(T);
             }
         }
 

@@ -9,7 +9,8 @@ namespace outliner
     public interface ContentHandler
     {
         void handleSelectContent(Content content, TextFilter f);
-        void handleFilteredcontent(Content content, TextFilter f);
+        void handleContextContent(Content content, TextFilter f);
+        void handleFilteredContent(Content content, TextFilter f);
         void handleSelectNodeParent(Content content, TextFilter f);
     }
 
@@ -18,8 +19,9 @@ namespace outliner
         class EmptyContentHandler : ContentHandler
         {
             public void handleSelectContent(Content content, TextFilter f) { }
-            public void handleFilteredcontent(Content content, TextFilter f) { }
+            public void handleContextContent(Content content, TextFilter f) { }
             public void handleSelectNodeParent(Content content, TextFilter f) { }
+            public void handleFilteredContent(Content content, TextFilter f) { }
         }
 
         private TextFilter _filter = new TextFilter();
@@ -38,7 +40,7 @@ namespace outliner
                 }
             }
 
-            get
+            get                                                           
             {
                 return _filter;
             }
@@ -100,6 +102,10 @@ namespace outliner
                 found_in_child = handleChildrenWithAllContext(n, output);
             }
 
+            return handleCurrentNode(n, output, found_in_child);
+        }
+
+        private bool handleCurrentNode(Content n, Content output , bool found_in_child ) {
             output.Name = n.Name;
             if (_filter == null || _filter.isMatch(n.Name))
             {
@@ -107,13 +113,13 @@ namespace outliner
                 return true;
             }
 
-            if (found_in_child == true )
+            if (found_in_child == true)
             {
                 h.handleSelectNodeParent(output, _filter);
                 return true;
             }
 
-            h.handleFilteredcontent(output, _filter);
+            h.handleContextContent(output, _filter);
             return false;
         }
 
@@ -134,18 +140,34 @@ namespace outliner
             return found_in_child;
         }
 
+        private Content generateFilteIndication() {
+            Content new_content = new Content();
+            new_content.Name = ".....";
+            h.handleFilteredContent(new_content, _filter);
+            return new_content;
+        }
+
         private bool handleChildrenWithContextConstrain(Content n, Content output)
         {
             bool found_in_child = false;
 
             FixedSizeQueue<Content> previouseContextContent = new FixedSizeQueue<Content>(contextSize);
+            bool needPreviouseFilterIndication = false;
+
             int postConextContentCount = 0;
+            bool needPostFilterIndication = false;
 
             foreach (Content c in n.Chidren)
             {
                 Content new_c = new Content();
+
                 if (restrcutre(c, new_c) == true)
                 {
+                    if (needPreviouseFilterIndication == true) {
+                        output.addChild(generateFilteIndication());
+                        needPreviouseFilterIndication = false;
+                    }
+
                     while (previouseContextContent.Count > 0)
                     {
                         output.addChild(previouseContextContent.Dequeue());
@@ -162,16 +184,29 @@ namespace outliner
                     {
                         output.addChild(new_c);
                         postConextContentCount--;
+
+                        if (postConextContentCount == 0 ) {
+                            needPostFilterIndication = true;
+                        }
                     }
                     else
                     {
-                        previouseContextContent.Enqueue(new_c);
+                        if (previouseContextContent.Enqueue(new_c) != null)
+                        {
+                            needPreviouseFilterIndication = true;
+                        }
+
+                        if (needPostFilterIndication == true) {
+                            output.addChild(generateFilteIndication());
+                            needPostFilterIndication = false;
+                        }
                     }
                 }
             }
 
             return found_in_child;
         }
+
         //====================================
     
         public void info()
@@ -196,15 +231,15 @@ namespace outliner
             this.enableContextConstrain = true;
             this.contextSize = 3;
             checkQuickFilterResult("aa", 2, 0);
-            checkQuickFilterResult("_0", 2, 4);
-            checkQuickFilterResult("_1", 2, 5);
-            checkQuickFilterResult("_2", 2, 6);
-            checkQuickFilterResult("_3", 2, 7);
-            checkQuickFilterResult("_4", 2, 7);
-            checkQuickFilterResult("_5", 2, 7);
-            checkQuickFilterResult("_6", 2, 6);
-            checkQuickFilterResult("_7", 2, 5);
-            checkQuickFilterResult("_8", 2, 4);
+            checkQuickFilterResult("_0", 2, 5);
+            checkQuickFilterResult("_1", 2, 6);
+            checkQuickFilterResult("_2", 2, 7);
+            checkQuickFilterResult("_3", 2, 8);
+            checkQuickFilterResult("_4", 2, 9);
+            checkQuickFilterResult("_5", 2, 8);
+            checkQuickFilterResult("_6", 2, 7);
+            checkQuickFilterResult("_7", 2, 6);
+            checkQuickFilterResult("_8", 2, 5);
 
             this.enableContextConstrain = false;
             this.contextSize = 7;

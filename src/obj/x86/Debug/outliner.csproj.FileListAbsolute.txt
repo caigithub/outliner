@@ -27,3 +27,13 @@ C:\skydrive\文档\github\local\workspace_c\outliner\src\bin\Debug\outliner.exe
 C:\skydrive\文档\github\local\workspace_c\outliner\src\bin\Debug\outliner.pdb
 C:\skydrive\文档\github\local\workspace_c\outliner\src\obj\x86\Debug\outliner.exe
 C:\skydrive\文档\github\local\workspace_c\outliner\src\obj\x86\Debug\outliner.pdb
+C:\port\document\skydrive\document\github\outliner\src\bin\Debug\outliner.exe.config
+C:\port\document\skydrive\document\github\outliner\src\obj\x86\Debug\outliner.exe
+C:\port\document\skydrive\document\github\outliner\src\obj\x86\Debug\outliner.pdb
+C:\port\document\skydrive\document\github\outliner\src\bin\Debug\outliner.exe
+C:\port\document\skydrive\document\github\outliner\src\bin\Debug\outliner.pdb
+C:\port\document\skydrive\document\github\outliner\src\obj\x86\Debug\outliner.csprojResolveAssemblyReference.cache
+C:\port\document\skydrive\document\github\outliner\src\obj\x86\Debug\outliner.Form1.resources
+C:\port\document\skydrive\document\github\outliner\src\obj\x86\Debug\outliner.Properties.Resources.resources
+C:\port\document\skydrive\document\github\outliner\src\obj\x86\Debug\outliner.Tree.resources
+C:\port\document\skydrive\document\github\outliner\src\obj\x86\Debug\outliner.csproj.GenerateResource.Cache
