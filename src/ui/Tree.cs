@@ -40,6 +40,32 @@ namespace outliner
 
  
         //===============
+        public void expandAt(int level) {
+            if (level <= 0)
+            {
+                _tree_control.ExpandAll();
+            }
+            else {
+                expandAt(_tree_control.Nodes, level);
+            }
+        }
+
+        private void expandAt(TreeNodeCollection nodes, int level) {
+            if (nodes == null) {
+                return;
+            }
+
+            foreach (TreeNode n in nodes) {
+                if (level <= 0)
+                {
+                    n.Collapse();
+                }
+                else {
+                    n.Expand();
+                    expandAt(n.Nodes, level - 1);
+                }
+            }
+        }
 
         public void add(Content n)
         {

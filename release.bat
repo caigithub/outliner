@@ -10,4 +10,6 @@
 @echo building %solution% solution...
 "%build_cmd%" %solution%.sln /build %build% 
 
+rd "src\obj" /S /Q
+
 pause

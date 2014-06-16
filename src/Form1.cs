@@ -63,9 +63,30 @@ namespace outliner
         private void ApplySourceFile(string file_name)
         {
             button2.Text = Path.GetFileName(file_name);
-            _analyzed_content = _analyzer.analyze(File.ReadAllLines(file_name));
 
-            refresh();
+            try
+            {
+                _analyzed_content = _analyzer.analyze(File.ReadAllLines(file_name));
+                refresh();
+            }
+            catch (Exception ex) {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void _expandLevel2_Click(object sender, EventArgs e)
+        {
+            _tree_view.expandAt(1);
+        }
+
+        private void _expandLevel3_Click(object sender, EventArgs e)
+        {
+            _tree_view.expandAt(2);
+        }
+
+        private void _expandAll_Click(object sender, EventArgs e)
+        {
+            _tree_view.expandAt(-1);
         }
 
         //===========================
@@ -102,6 +123,7 @@ namespace outliner
             _tree_view.clear();
             _tree_view.add(new_content);
         }
+
 
         
     }
