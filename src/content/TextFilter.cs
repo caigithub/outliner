@@ -93,35 +93,5 @@ namespace outliner
             System.Diagnostics.Debug.WriteLine("== filter valid : " + isValid().ToString());
         }
 
-        //====================================
-
-        public void test()
-        {
-            Tester.info(this.GetType());
-
-            string org = "Build started: Project: outliner, Configuration: Debug x86";
-
-            string[] trueMatchesKeywrods = { "", " ", "start", "start outline", "startmm outline", "start outlinemm" };
-            foreach (string r in trueMatchesKeywrods)
-            {
-                filterString = r;
-                Tester.check(true, isMatch(org), r);
-            }
-
-            string[] falseMatchesKeywords = { "startmm", "(", ")", "[", "]", "{", "}", "^", "$", "*", ".", "+", "?", "|" };
-            foreach (string r in falseMatchesKeywords)
-            {
-                filterString = r;
-                Tester.check(false, isMatch(org), r);
-            }
-
-            string repecialKeywords = "()[]{}^$*.+?|";
-            string[] repecialMatches = { "(", ")", "[", "]", "{", "}", "^", "$", "*", ".", "+", "?", "|" };
-            foreach (string r in repecialMatches)
-            {
-                filterString = r;
-                Tester.check(true, isMatch(repecialKeywords), r);
-            }
-        }
     }
 }

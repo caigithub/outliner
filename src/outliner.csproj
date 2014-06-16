@@ -61,7 +61,6 @@
     <Compile Include="content\FixedSizeQueue.cs" />
     <Compile Include="content\TextFilter.cs" />
     <Compile Include="scope\ScopeAnazlyzer.cs" />
-    <Compile Include="common\Tester.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -73,6 +72,7 @@
     <Compile Include="content\ContentRestructor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="scope\ScopeMatchResult.cs" />
     <Compile Include="ui\ContentHandlers.cs" />
     <Compile Include="ui\NodeFormatter.cs" />
     <Compile Include="ui\NodeConvertor.cs" />

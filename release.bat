@@ -11,5 +11,7 @@
 "%build_cmd%" %solution%.sln /build %build% 
 
 rd "src\obj" /S /Q
+rd "outlinerTest\obj" /S /Q
+rd "outlinerTest\bin" /S /Q
 
 pause

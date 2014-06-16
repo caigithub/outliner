@@ -13,11 +13,6 @@ namespace outliner
         [STAThread]
         static void Main(string[] args)
         {
-            new ScopeDefinition().test();
-            new TextFilter().test();
-            new FixedSizeQueue<Content>(3).test();
-            new ContentRestructor().test();
-
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 

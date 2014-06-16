@@ -29,26 +29,5 @@ namespace outliner
                 return default(T);
             }
         }
-
-        //==================
-
-        public void test()
-        {
-            Tester.info(this.GetType());
-
-            FixedSizeQueue<Content> testObject = new FixedSizeQueue<Content>(3);
-            testObject.Enqueue(new Content());
-            testObject.Enqueue(new Content());
-            testObject.Enqueue(new Content());
-            testObject.Enqueue(new Content());
-            testObject.Enqueue(new Content());
-            testObject.Enqueue(new Content());
-            testObject.Enqueue(new Content());
-
-            Tester.check(3, testObject.Count, "current size = 3");
-
-            testObject.Dequeue();
-            Tester.check(2, testObject.Count, "current size = 2");
-        }
     }
 }
