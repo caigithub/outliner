@@ -84,6 +84,16 @@ namespace outliner
             _tree_view.expandAt(2);
         }
 
+        private void _expandLevel4_Click(object sender, EventArgs e)
+        {
+            _tree_view.expandAt(3);
+        }
+
+        private void _expandLevel5_Click(object sender, EventArgs e)
+        {
+            _tree_view.expandAt(4);
+        }
+
         private void _expandAll_Click(object sender, EventArgs e)
         {
             _tree_view.expandAt(-1);
@@ -123,6 +133,8 @@ namespace outliner
             _tree_view.clear();
             _tree_view.add(new_content);
         }
+
+
 
 
         

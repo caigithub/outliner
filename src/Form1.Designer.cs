@@ -39,6 +39,8 @@
             this._expandLevel2 = new System.Windows.Forms.Button();
             this._expandLevel3 = new System.Windows.Forms.Button();
             this._expandAll = new System.Windows.Forms.Button();
+            this._expandLevel4 = new System.Windows.Forms.Button();
+            this._expandLevel5 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this._contextSize)).BeginInit();
             this.SuspendLayout();
             // 
@@ -156,13 +158,33 @@
             // 
             // _expandAll
             // 
-            this._expandAll.Location = new System.Drawing.Point(1040, 188);
+            this._expandAll.Location = new System.Drawing.Point(1040, 246);
             this._expandAll.Name = "_expandAll";
             this._expandAll.Size = new System.Drawing.Size(31, 23);
             this._expandAll.TabIndex = 17;
             this._expandAll.Text = "All";
             this._expandAll.UseVisualStyleBackColor = true;
             this._expandAll.Click += new System.EventHandler(this._expandAll_Click);
+            // 
+            // _expandLevel4
+            // 
+            this._expandLevel4.Location = new System.Drawing.Point(1040, 188);
+            this._expandLevel4.Name = "_expandLevel4";
+            this._expandLevel4.Size = new System.Drawing.Size(30, 23);
+            this._expandLevel4.TabIndex = 18;
+            this._expandLevel4.Text = "4";
+            this._expandLevel4.UseVisualStyleBackColor = true;
+            this._expandLevel4.Click += new System.EventHandler(this._expandLevel4_Click);
+            // 
+            // _expandLevel5
+            // 
+            this._expandLevel5.Location = new System.Drawing.Point(1040, 217);
+            this._expandLevel5.Name = "_expandLevel5";
+            this._expandLevel5.Size = new System.Drawing.Size(30, 23);
+            this._expandLevel5.TabIndex = 19;
+            this._expandLevel5.Text = "5";
+            this._expandLevel5.UseVisualStyleBackColor = true;
+            this._expandLevel5.Click += new System.EventHandler(this._expandLevel5_Click);
             // 
             // Form1
             // 
@@ -171,6 +193,8 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1082, 619);
+            this.Controls.Add(this._expandLevel5);
+            this.Controls.Add(this._expandLevel4);
             this.Controls.Add(this._expandAll);
             this.Controls.Add(this._expandLevel3);
             this.Controls.Add(this._expandLevel2);
@@ -204,6 +228,8 @@
         private System.Windows.Forms.Button _expandLevel2;
         private System.Windows.Forms.Button _expandLevel3;
         private System.Windows.Forms.Button _expandAll;
+        private System.Windows.Forms.Button _expandLevel4;
+        private System.Windows.Forms.Button _expandLevel5;
     }
 }
 
