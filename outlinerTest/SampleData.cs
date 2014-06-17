@@ -9,6 +9,10 @@ namespace outlinerTest
 {
     public class SampleData
     {
+        public static int contentChildrenCount() {
+            return 20;
+        }
+
         public static Content contentTree()
         {
             // root
@@ -26,8 +30,8 @@ namespace outlinerTest
             Content root = new Content();
             root.Name = "root";
 
-            root.addChild( contentNode("aa", 9));
-            root.addChild( contentNode("bb", 9));
+            root.addChild(contentNode("aa", contentChildrenCount()));
+            root.addChild(contentNode("bb", contentChildrenCount()));
 
             return root;
         }

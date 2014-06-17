@@ -152,10 +152,8 @@ namespace outliner
             bool found_in_child = false;
 
             FixedSizeQueue<Content> previouseContextContent = new FixedSizeQueue<Content>(contextSize);
-            bool needPreviouseFilterIndication = false;
-
             int postConextContentCount = 0;
-            bool needPostFilterIndication = false;
+            int filteredContentCount = 0;
 
             foreach (Content c in n.Chidren)
             {
@@ -163,9 +161,9 @@ namespace outliner
 
                 if (restrcutre(c, new_c) == true)
                 {
-                    if (needPreviouseFilterIndication == true) {
+                    if (filteredContentCount > 0) {
                         output.addChild(generateFilteIndication());
-                        needPreviouseFilterIndication = false;
+                        filteredContentCount = 0;
                     }
 
                     while (previouseContextContent.Count > 0)
@@ -184,26 +182,23 @@ namespace outliner
                     {
                         output.addChild(new_c);
                         postConextContentCount--;
-
-                        if (postConextContentCount == 0 ) {
-                            needPostFilterIndication = true;
-                        }
                     }
                     else
                     {
                         if (previouseContextContent.Enqueue(new_c) != null)
                         {
-                            needPreviouseFilterIndication = true;
-                        }
-
-                        if (needPostFilterIndication == true) {
-                            output.addChild(generateFilteIndication());
-                            needPostFilterIndication = false;
+                            filteredContentCount++;
                         }
                     }
                 }
             }
 
+            if (filteredContentCount > 0 || previouseContextContent.Count > 0)
+            {
+                previouseContextContent.Clear();
+                output.addChild(generateFilteIndication());
+                filteredContentCount = 0;
+            }
             return found_in_child;
         }
 

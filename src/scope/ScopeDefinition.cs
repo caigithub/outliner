@@ -44,7 +44,5 @@ namespace outliner
 
             return new ScopeMatchResult(ScopeEndCount, ScopeBeginCount);
         }
-
-        //====================================
     }
 }
