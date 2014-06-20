@@ -81,6 +81,8 @@
             // 
             // button2
             // 
+            this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.button2.FlatAppearance.BorderSize = 0;
             this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
@@ -94,6 +96,7 @@
             // 
             // _enableContext
             // 
+            this._enableContext.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._enableContext.AutoSize = true;
             this._enableContext.Checked = true;
             this._enableContext.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -107,6 +110,7 @@
             // 
             // _contextSize
             // 
+            this._contextSize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._contextSize.Location = new System.Drawing.Point(910, 89);
             this._contextSize.Name = "_contextSize";
             this._contextSize.Size = new System.Drawing.Size(43, 20);
@@ -119,6 +123,7 @@
             // 
             // label1
             // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(955, 92);
             this.label1.Name = "label1";
@@ -138,6 +143,7 @@
             // 
             // _expandLevel2
             // 
+            this._expandLevel2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._expandLevel2.Location = new System.Drawing.Point(1040, 130);
             this._expandLevel2.Name = "_expandLevel2";
             this._expandLevel2.Size = new System.Drawing.Size(30, 23);
@@ -148,6 +154,7 @@
             // 
             // _expandLevel3
             // 
+            this._expandLevel3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._expandLevel3.Location = new System.Drawing.Point(1040, 159);
             this._expandLevel3.Name = "_expandLevel3";
             this._expandLevel3.Size = new System.Drawing.Size(30, 23);
@@ -158,6 +165,7 @@
             // 
             // _expandAll
             // 
+            this._expandAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._expandAll.Location = new System.Drawing.Point(1040, 246);
             this._expandAll.Name = "_expandAll";
             this._expandAll.Size = new System.Drawing.Size(31, 23);
@@ -168,6 +176,7 @@
             // 
             // _expandLevel4
             // 
+            this._expandLevel4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._expandLevel4.Location = new System.Drawing.Point(1040, 188);
             this._expandLevel4.Name = "_expandLevel4";
             this._expandLevel4.Size = new System.Drawing.Size(30, 23);
@@ -178,6 +187,7 @@
             // 
             // _expandLevel5
             // 
+            this._expandLevel5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._expandLevel5.Location = new System.Drawing.Point(1040, 217);
             this._expandLevel5.Name = "_expandLevel5";
             this._expandLevel5.Size = new System.Drawing.Size(30, 23);
