@@ -26,10 +26,11 @@ namespace outliner
 
             ScopeMatchResult indent = new ScopeMatchResult(0, 0);
 
+            int line_index = 0;
             foreach (string s in content)
             {
+                line_index++;
                 string temp = s.Trim();
-                
 
                 if (temp.Length > 0)
                 {
@@ -39,7 +40,7 @@ namespace outliner
 
                     System.Diagnostics.Trace.WriteLine(String.Format("[{0:0000}] {1}", indent.currentLineIndent , temp));
 
-                    Content new_node = Content.createNode(temp);
+                    Content new_node = Content.createNode(temp, line_index);
                     Content old_node = current;
 
                     if ( indent.currentLineIndent == 0)
@@ -121,32 +122,5 @@ namespace outliner
         }
 
         private List<Content> _exclude_list = new List<Content>();
-
-        /*
-        private Node indentSiblingsToChildren(Node n, string text)
-        {
-            Node new_n = Node.createNode(text);
-            _exclude_list.Add(new_n);
-
-            if (n == null)
-            {
-                return new_n;
-            }
-
-            if (n.Parent == null)
-            {
-                new_n.addChild(n);
-                return new_n;
-            }
-            else
-            {
-                new_n.addChildren(n.Parent.Nodes);
-                n.Parent.Nodes.Clear();
-                n.Parent.addChild(new_n);
-                return new_n;
-            }
-        }
-         * 
-         * */
     }
 }

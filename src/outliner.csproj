@@ -82,6 +82,7 @@
     <Compile Include="ui\Tree.Designer.cs">
       <DependentUpon>Tree.cs</DependentUpon>
     </Compile>
+    <Compile Include="ui\TreeEvents.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

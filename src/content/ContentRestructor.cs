@@ -106,7 +106,8 @@ namespace outliner
         }
 
         private bool handleCurrentNode(Content n, Content output , bool found_in_child ) {
-            output.Name = n.Name;
+            n.shadowCopyTo(output);
+            
             if (_filter == null || _filter.isMatch(n.Name))
             {
                 h.handleSelectContent(output, _filter);

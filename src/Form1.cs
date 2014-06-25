@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.IO;
 
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace outliner
 {
@@ -22,7 +23,7 @@ namespace outliner
         {
             InitializeComponent();
             ApplySourceFile(file_name);
-
+            this._tree_view.events.onDoubleClickNode += _onDoubleClickNode;
         }
 
         private void file_name_Click(object sender, EventArgs e)
@@ -63,6 +64,7 @@ namespace outliner
         private void ApplySourceFile(string file_name)
         {
             button2.Text = Path.GetFileName(file_name);
+            button2.Tag = file_name;
 
             try
             {
@@ -99,6 +101,9 @@ namespace outliner
             _tree_view.expandAt(-1);
         }
 
+        private void _onDoubleClickNode(Content c) {
+            execute(_edit_command.Text, c);
+        }
         //===========================
 
         private Content _analyzed_content = null;
@@ -107,7 +112,48 @@ namespace outliner
         private ContentRestructor _restructor = new ContentRestructor();
 
         //===========================
+        private void execute(string command, Content content) {
+            string[] elements = command.Split(new char[] {' '} , StringSplitOptions.RemoveEmptyEntries);
 
+            string exe_path = "";
+            string argument = "";
+            bool exe_scan_finished = false;
+
+            foreach (string s in elements) {
+                if (exe_scan_finished == false)
+                {
+                    exe_path = exe_path + " " + s;
+                    if (File.Exists(exe_path) == true)
+                    {
+                        exe_scan_finished = true;
+                    }
+                }
+                else {
+                    argument = argument + " " + s;
+                }
+            }
+
+            if (File.Exists(exe_path) == false) {
+                MessageBox.Show( exe_path + "\r\n        does not exist");
+                return;
+            }
+
+            argument = argument.Replace("$(file)", button2.Tag as string);
+            argument = argument.Replace("$(line)", content.lineNumber.ToString());
+
+            try
+            {
+                System.Diagnostics.Process proc = new System.Diagnostics.Process();
+                proc.EnableRaisingEvents = false;
+                proc.StartInfo.FileName = exe_path.Trim();
+                proc.StartInfo.Arguments = argument.Trim();
+
+                proc.Start();
+            }
+            catch (Exception ex) {
+                MessageBox.Show(ex.Message);
+            }
+        }
 
         private void refresh()
         {
@@ -133,10 +179,5 @@ namespace outliner
             _tree_view.clear();
             _tree_view.add(new_content);
         }
-
-
-
-
-        
     }
 }

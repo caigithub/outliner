@@ -35,12 +35,13 @@
             this._enableContext = new System.Windows.Forms.CheckBox();
             this._contextSize = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
-            this._tree_view = new outliner.Tree();
             this._expandLevel2 = new System.Windows.Forms.Button();
             this._expandLevel3 = new System.Windows.Forms.Button();
             this._expandAll = new System.Windows.Forms.Button();
             this._expandLevel4 = new System.Windows.Forms.Button();
             this._expandLevel5 = new System.Windows.Forms.Button();
+            this._edit_command = new System.Windows.Forms.TextBox();
+            this._tree_view = new outliner.Tree();
             ((System.ComponentModel.ISupportInitialize)(this._contextSize)).BeginInit();
             this.SuspendLayout();
             // 
@@ -131,16 +132,6 @@
             this.label1.TabIndex = 14;
             this.label1.Text = "Lines Context";
             // 
-            // _tree_view
-            // 
-            this._tree_view.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._tree_view.Location = new System.Drawing.Point(43, 130);
-            this._tree_view.Name = "_tree_view";
-            this._tree_view.Size = new System.Drawing.Size(989, 460);
-            this._tree_view.TabIndex = 2;
-            // 
             // _expandLevel2
             // 
             this._expandLevel2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -196,6 +187,24 @@
             this._expandLevel5.UseVisualStyleBackColor = true;
             this._expandLevel5.Click += new System.EventHandler(this._expandLevel5_Click);
             // 
+            // _edit_command
+            // 
+            this._edit_command.Location = new System.Drawing.Point(43, 575);
+            this._edit_command.Name = "_edit_command";
+            this._edit_command.Size = new System.Drawing.Size(989, 20);
+            this._edit_command.TabIndex = 20;
+            this._edit_command.Text = "C:\\Program Files\\Vim\\vim73\\gvim.exe  $(file) +$(line)";
+            // 
+            // _tree_view
+            // 
+            this._tree_view.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._tree_view.Location = new System.Drawing.Point(43, 130);
+            this._tree_view.Name = "_tree_view";
+            this._tree_view.Size = new System.Drawing.Size(989, 425);
+            this._tree_view.TabIndex = 2;
+            // 
             // Form1
             // 
             this.AcceptButton = this._filter_input;
@@ -203,6 +212,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1082, 619);
+            this.Controls.Add(this._edit_command);
             this.Controls.Add(this._expandLevel5);
             this.Controls.Add(this._expandLevel4);
             this.Controls.Add(this._expandAll);
@@ -240,6 +250,7 @@
         private System.Windows.Forms.Button _expandAll;
         private System.Windows.Forms.Button _expandLevel4;
         private System.Windows.Forms.Button _expandLevel5;
+        private System.Windows.Forms.TextBox _edit_command;
     }
 }
 

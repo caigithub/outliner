@@ -51,7 +51,6 @@
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.copyNodeTextIncludeChildrenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // _tree_control
@@ -86,7 +85,22 @@
             treeNode10});
             this._tree_control.Size = new System.Drawing.Size(150, 150);
             this._tree_control.TabIndex = 0;
-            
+            this._tree_control.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this._tree_control_MouseDoubleClick);
+            // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(32, 19);
+            // 
+            // copyNodeTextIncludeChildrenToolStripMenuItem
+            // 
+            this.copyNodeTextIncludeChildrenToolStripMenuItem.Name = "copyNodeTextIncludeChildrenToolStripMenuItem";
+            this.copyNodeTextIncludeChildrenToolStripMenuItem.Size = new System.Drawing.Size(32, 19);
             // 
             // Tree
             // 
@@ -94,7 +108,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this._tree_control);
             this.Name = "Tree";
-            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

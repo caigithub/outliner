@@ -7,12 +7,12 @@ namespace outliner
  
     public class Content
     {
-        public static Content createNode(string i_name, object i_data = null)
+        public static Content createNode(string i_name, int line_num, object i_data = null)
         {
             Content result = new Content();
             result.Name = i_name;
             result.putData(i_data);
-
+            result.lineNumber = line_num;
             return result;
         }
 
@@ -51,6 +51,13 @@ namespace outliner
             return this.Parent.addChild(n);
         }
 
+        public void shadowCopyTo(Content target) {
+            if (target != null) {
+                target.Name = this.Name;
+                target.lineNumber = this.lineNumber;
+                target._data = this._data;
+            }
+        }
         //================= properties ==============
 
         private List<Content> _chidren = new List<Content>();
@@ -89,7 +96,18 @@ namespace outliner
                 _name = value;
             }
         }
-        
+
+        private int _line_num = 0;
+        public int lineNumber {
+            get {
+                return _line_num;
+            }
+
+            set {
+                _line_num = value;
+            }                                                 
+        }
+
         private object _data = null;
         public void putData(object data)
         {
@@ -108,7 +126,7 @@ namespace outliner
 
         public void info( string indent = "" )
         {
-            System.Diagnostics.Trace.WriteLine( indent + this.Name);
+            System.Diagnostics.Trace.WriteLine(string.Format("{0}[{1}] {2}", indent, this.lineNumber, this.Name));
             foreach (Content n in this.Chidren)
             {
                 n.info(indent + "  ");
