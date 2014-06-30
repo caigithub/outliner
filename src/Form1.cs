@@ -24,6 +24,7 @@ namespace outliner
             InitializeComponent();
             ApplySourceFile(file_name);
             this._tree_view.events.onDoubleClickNode += _onDoubleClickNode;
+           // toggleSetting();
         }
 
         private void file_name_Click(object sender, EventArgs e)
@@ -178,6 +179,35 @@ namespace outliner
 
             _tree_view.clear();
             _tree_view.add(new_content);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            toggleSetting();
+        }
+
+        private void toggleSetting()
+        {
+            int margin = 50;
+            int offset = 1;
+
+            if (_edit_command.Visible)
+            {
+                offset = margin * 1;
+
+                _label_open_with.Visible = false;
+                _edit_command.Visible = false;
+            }
+            else
+            {
+                offset = margin * -1;
+
+                _label_open_with.Visible = true;
+                _edit_command.Visible = true;
+            }
+
+            _toggle.Top = _toggle.Top + offset;
+            _tree_view.Height = _tree_view.Height + offset;
         }
     }
 }

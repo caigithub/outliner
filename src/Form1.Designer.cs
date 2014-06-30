@@ -41,6 +41,8 @@
             this._expandLevel4 = new System.Windows.Forms.Button();
             this._expandLevel5 = new System.Windows.Forms.Button();
             this._edit_command = new System.Windows.Forms.TextBox();
+            this._toggle = new System.Windows.Forms.Button();
+            this._label_open_with = new System.Windows.Forms.Label();
             this._tree_view = new outliner.Tree();
             ((System.ComponentModel.ISupportInitialize)(this._contextSize)).BeginInit();
             this.SuspendLayout();
@@ -189,11 +191,31 @@
             // 
             // _edit_command
             // 
-            this._edit_command.Location = new System.Drawing.Point(43, 575);
+            this._edit_command.Location = new System.Drawing.Point(120, 567);
             this._edit_command.Name = "_edit_command";
-            this._edit_command.Size = new System.Drawing.Size(989, 20);
+            this._edit_command.Size = new System.Drawing.Size(912, 20);
             this._edit_command.TabIndex = 20;
             this._edit_command.Text = "C:\\Program Files\\Vim\\vim73\\gvim.exe  $(file) +$(line)";
+            this._edit_command.Visible = false;
+            // 
+            // _toggle
+            // 
+            this._toggle.Location = new System.Drawing.Point(998, 565);
+            this._toggle.Name = "_toggle";
+            this._toggle.Size = new System.Drawing.Size(34, 23);
+            this._toggle.TabIndex = 21;
+            this._toggle.UseVisualStyleBackColor = true;
+            this._toggle.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // _label_open_with
+            // 
+            this._label_open_with.AutoSize = true;
+            this._label_open_with.Location = new System.Drawing.Point(47, 567);
+            this._label_open_with.Name = "_label_open_with";
+            this._label_open_with.Size = new System.Drawing.Size(67, 13);
+            this._label_open_with.TabIndex = 22;
+            this._label_open_with.Text = "Open With : ";
+            this._label_open_with.Visible = false;
             // 
             // _tree_view
             // 
@@ -202,7 +224,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this._tree_view.Location = new System.Drawing.Point(43, 130);
             this._tree_view.Name = "_tree_view";
-            this._tree_view.Size = new System.Drawing.Size(989, 425);
+            this._tree_view.Size = new System.Drawing.Size(989, 429);
             this._tree_view.TabIndex = 2;
             // 
             // Form1
@@ -212,6 +234,8 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1082, 619);
+            this.Controls.Add(this._label_open_with);
+            this.Controls.Add(this._toggle);
             this.Controls.Add(this._edit_command);
             this.Controls.Add(this._expandLevel5);
             this.Controls.Add(this._expandLevel4);
@@ -251,6 +275,8 @@
         private System.Windows.Forms.Button _expandLevel4;
         private System.Windows.Forms.Button _expandLevel5;
         private System.Windows.Forms.TextBox _edit_command;
+        private System.Windows.Forms.Button _toggle;
+        private System.Windows.Forms.Label _label_open_with;
     }
 }
 
