@@ -200,7 +200,8 @@
             // 
             // _toggle
             // 
-            this._toggle.Location = new System.Drawing.Point(998, 565);
+            this._toggle.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this._toggle.Location = new System.Drawing.Point(998, 567);
             this._toggle.Name = "_toggle";
             this._toggle.Size = new System.Drawing.Size(34, 23);
             this._toggle.TabIndex = 21;
