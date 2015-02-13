@@ -10,7 +10,8 @@ namespace outliner.ui
     public interface Formatter
     {
         void initNode(TreeNode node);
-        void draw(Rectangle rect, Graphics g, Font font , Boolean selected );
+        void draw(Rectangle rect, Graphics g, Font font, Boolean selected);
+        Boolean needExpand();
     }
 
     //==========================
@@ -33,6 +34,11 @@ namespace outliner.ui
         }
 
         private Boolean _expand = false;
+        virtual public Boolean needExpand()
+        {
+            return _expand;
+        }
+
         public NormalFormatter(String text, bool expand)
         {
             _label = text.Trim();
@@ -45,7 +51,8 @@ namespace outliner.ui
             {
                 node.Collapse();
             }
-            else {
+            else
+            {
                 node.Expand();
             }
         }
@@ -62,7 +69,7 @@ namespace outliner.ui
             Color label_color = Color.Black;
             g.DrawString(_label,
                             font,
-                            new SolidBrush( label_color ),
+                            new SolidBrush(label_color),
                             rect.Left,
                             rect.Top);
         }
@@ -71,14 +78,19 @@ namespace outliner.ui
     public class PathHighlightFormatter : NormalFormatter
     {
         public PathHighlightFormatter(String text)
-            : base(Color.Wheat , text)
+            : base(Color.Wheat, text)
         {
         }
 
         override public void initNode(TreeNode node)
         {
             node.Expand();
-        }                 
+        }
+
+        override public Boolean needExpand()
+        {
+            return true;
+        }
     }
 
     public class NodeHighlightFormatter : Formatter
@@ -88,12 +100,17 @@ namespace outliner.ui
 
         public NodeHighlightFormatter(String text, String matcher)
         {
-            _label = Regex.Split(text, matcher , RegexOptions.IgnoreCase );
+            _label = Regex.Split(text, matcher, RegexOptions.IgnoreCase);
         }
 
         public void initNode(TreeNode node)
         {
             node.Expand();
+        }
+
+        public Boolean needExpand()
+        {
+            return true;
         }
 
         public void draw(Rectangle rect, Graphics g, Font font, Boolean selected)
@@ -125,7 +142,7 @@ namespace outliner.ui
         {
             SizeF s = g.MeasureString(name, font);
             g.FillRectangle(
-                    new SolidBrush( _background_color ) ,
+                    new SolidBrush(_background_color),
                     x_pos,
                     y_pos,
                     s.Width,

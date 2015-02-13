@@ -13,18 +13,18 @@ namespace outlinerTest
             check("{", 0, 1);
             check("{}",0, 0);
             check("{}{",0, 1);
-            check("{}}",-1, 0);
+            check("{}}",0, -1);
             check("{{",0, 2);
             check("{{{",0, 3);
             check("{{}",0, 1);
 
-            check("}",-1, 0);
-            check("}{",-1, 1);
-            check("}{{",-1, 2);
-            check("}{}",-1, 0);
-            check("}}",-2, 0);
-            check("}}{",-2, 1);
-            check("}}}",-3, 0);
+            check("}",0, -1);
+            check("}{",0, 0);
+            check("}{{",0, 1);
+            check("}{}",0, -1);
+            check("}}",-1, -1);
+            check("}}{",-1, 0);
+            check("}}}",-2, -1);
         }
 
         private void check(string lineContent, int expectedCurrentIndent, int expectedNextIndent) {

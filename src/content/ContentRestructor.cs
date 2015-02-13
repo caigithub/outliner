@@ -40,7 +40,7 @@ namespace outliner
                 }
             }
 
-            get                                                           
+            get
             {
                 return _filter;
             }
@@ -62,149 +62,72 @@ namespace outliner
             }
         }
 
-        private int _contextSize = 3;
-        public int contextSize
+        public bool restrcutre(Content n, Content new_node)
         {
-            get {
-                return _contextSize;
-            }
-
-            set {
-                _contextSize = value;
-            }
-        }
-
-        private bool _enableContextConstrain = true;
-        public bool enableContextConstrain
-        {
-            get {
-                return _enableContextConstrain;
-            }
-
-            set {
-                _enableContextConstrain = value;
-            }
-        }
-
-        public bool restrcutre(Content n, Content output)
-        {
-            if (n == null || output == null)
+            if (n == null || new_node == null)
             {
                 return true;
             }
 
             bool found_in_child = false;
-            if (enableContextConstrain == true)
-            {
-                found_in_child = handleChildrenWithContextConstrain(n, output);
-            }
-            else {
-                found_in_child = handleChildrenWithAllContext(n, output);
-            }
-
-            return handleCurrentNode(n, output, found_in_child);
-        }
-
-        private bool handleCurrentNode(Content n, Content output , bool found_in_child ) {
-            n.shadowCopyTo(output);
-            
-            if (_filter == null || _filter.isMatch(n.Name))
-            {
-                h.handleSelectContent(output, _filter);
-                return true;
-            }
-
-            if (found_in_child == true)
-            {
-                h.handleSelectNodeParent(output, _filter);
-                return true;
-            }
-
-            h.handleContextContent(output, _filter);
-            return false;
-        }
-
-        private bool handleChildrenWithAllContext(Content n, Content output) {
-            bool found_in_child = false;
+            Content ellipsis = null;
 
             foreach (Content c in n.Chidren)
             {
                 Content new_c = new Content();
+                
                 if (restrcutre(c, new_c) == true)
                 {
+                    new_node.addChild(new_c);
+                    ellipsis = null;
                     found_in_child = true;
                 }
-                
-                output.addChild(new_c);
+                else
+                {
+                    if (ellipsis == null)
+                    {
+                        ellipsis = generateEllipsis();
+                        new_node.addChild(ellipsis);
+                    }
+
+                    ellipsis.addChild(new_c);
+                }
             }
 
-            return found_in_child;
+
+            return handleCurrentNode(n, new_node, found_in_child );
         }
 
-        private Content generateFilteIndication() {
+        //====================================
+        private Content generateEllipsis()
+        {
             Content new_content = new Content();
             new_content.Name = ".....";
             h.handleFilteredContent(new_content, _filter);
             return new_content;
         }
 
-        private bool handleChildrenWithContextConstrain(Content n, Content output)
+        private bool handleCurrentNode(Content n, Content new_node, bool found_in_child)
         {
-            bool found_in_child = false;
+            n.shadowCopyTo(new_node);
 
-            FixedSizeQueue<Content> previouseContextContent = new FixedSizeQueue<Content>(contextSize);
-            int postConextContentCount = 0;
-            int filteredContentCount = 0;
-
-            foreach (Content c in n.Chidren)
+            if (_filter == null || _filter.isMatch(n.Name))
             {
-                Content new_c = new Content();
-
-                if (restrcutre(c, new_c) == true)
-                {
-                    if (filteredContentCount > 0) {
-                        output.addChild(generateFilteIndication());
-                        filteredContentCount = 0;
-                    }
-
-                    while (previouseContextContent.Count > 0)
-                    {
-                        output.addChild(previouseContextContent.Dequeue());
-                    }
-                    output.addChild(new_c);
-
-                    postConextContentCount = contextSize;
-
-                    found_in_child = true;
-                }
-                else
-                {
-                    if (postConextContentCount > 0)
-                    {
-                        output.addChild(new_c);
-                        postConextContentCount--;
-                    }
-                    else
-                    {
-                        if (previouseContextContent.Enqueue(new_c) != null)
-                        {
-                            filteredContentCount++;
-                        }
-                    }
-                }
+                h.handleSelectContent(new_node, _filter);
+                return true;
             }
 
-            if (filteredContentCount > 0 || previouseContextContent.Count > 0)
+            if (found_in_child == true)
             {
-                previouseContextContent.Clear();
-                output.addChild(generateFilteIndication());
-                filteredContentCount = 0;
+                h.handleSelectNodeParent(new_node, _filter);
+                return true;
             }
-            return found_in_child;
+
+            h.handleContextContent(new_node, _filter);
+            return false;
         }
-
         //====================================
-    
+
         public void info()
         {
             if (_filter == null)

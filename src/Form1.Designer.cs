@@ -32,9 +32,6 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this._filter_input = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
-            this._enableContext = new System.Windows.Forms.CheckBox();
-            this._contextSize = new System.Windows.Forms.NumericUpDown();
-            this.label1 = new System.Windows.Forms.Label();
             this._expandLevel2 = new System.Windows.Forms.Button();
             this._expandLevel3 = new System.Windows.Forms.Button();
             this._expandAll = new System.Windows.Forms.Button();
@@ -44,7 +41,6 @@
             this._toggle = new System.Windows.Forms.Button();
             this._label_open_with = new System.Windows.Forms.Label();
             this._tree_view = new outliner.Tree();
-            ((System.ComponentModel.ISupportInitialize)(this._contextSize)).BeginInit();
             this.SuspendLayout();
             // 
             // _key
@@ -96,43 +92,6 @@
             this.button2.Text = "<click to select a file>";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.file_name_Click);
-            // 
-            // _enableContext
-            // 
-            this._enableContext.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._enableContext.AutoSize = true;
-            this._enableContext.Checked = true;
-            this._enableContext.CheckState = System.Windows.Forms.CheckState.Checked;
-            this._enableContext.Location = new System.Drawing.Point(848, 91);
-            this._enableContext.Name = "_enableContext";
-            this._enableContext.Size = new System.Drawing.Size(54, 17);
-            this._enableContext.TabIndex = 12;
-            this._enableContext.Text = "Filte : ";
-            this._enableContext.UseVisualStyleBackColor = true;
-            this._enableContext.CheckedChanged += new System.EventHandler(this._enableContext_CheckedChanged);
-            // 
-            // _contextSize
-            // 
-            this._contextSize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._contextSize.Location = new System.Drawing.Point(910, 89);
-            this._contextSize.Name = "_contextSize";
-            this._contextSize.Size = new System.Drawing.Size(43, 20);
-            this._contextSize.TabIndex = 13;
-            this._contextSize.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            // 
-            // label1
-            // 
-            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(955, 92);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(71, 13);
-            this.label1.TabIndex = 14;
-            this.label1.Text = "Lines Context";
             // 
             // _expandLevel2
             // 
@@ -243,9 +202,6 @@
             this.Controls.Add(this._expandAll);
             this.Controls.Add(this._expandLevel3);
             this.Controls.Add(this._expandLevel2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this._contextSize);
-            this.Controls.Add(this._enableContext);
             this.Controls.Add(this._tree_view);
             this.Controls.Add(this.button2);
             this.Controls.Add(this._filter_input);
@@ -254,7 +210,6 @@
             this.Name = "Form1";
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.Form1_DragDrop);
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
-            ((System.ComponentModel.ISupportInitialize)(this._contextSize)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -267,9 +222,6 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button _filter_input;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.CheckBox _enableContext;
-        private System.Windows.Forms.NumericUpDown _contextSize;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button _expandLevel2;
         private System.Windows.Forms.Button _expandLevel3;
         private System.Windows.Forms.Button _expandAll;

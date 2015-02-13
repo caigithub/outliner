@@ -45,7 +45,7 @@ namespace outliner
         {
             if (level <= 0)
             {
-                _tree_control.ExpandAll();
+                expandToEnd(_tree_control.Nodes);
             }
             else
             {
@@ -68,9 +68,37 @@ namespace outliner
                 }
                 else
                 {
-                    n.Expand();
+                    if (((n.Tag as Content).getData() as ui.Formatter).needExpand())
+                    {
+                        n.Expand();
+                    }
+                    else
+                    {
+                        n.Collapse();
+                    }
                     expandAt(n.Nodes, level - 1);
                 }
+            }
+        }
+
+        private void expandToEnd(TreeNodeCollection nodes)
+        {
+            if (nodes == null)
+            {
+                return;
+            }
+
+            foreach (TreeNode n in nodes)
+            {
+                if (((n.Tag as Content).getData() as ui.Formatter).needExpand())
+                {
+                    n.Expand();
+                }
+                else
+                {
+                    n.Collapse();
+                }
+                expandToEnd(n.Nodes);
             }
         }
 

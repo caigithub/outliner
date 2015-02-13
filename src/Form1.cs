@@ -27,6 +27,8 @@ namespace outliner
            // toggleSetting();
         }
 
+        //===========================
+
         private void file_name_Click(object sender, EventArgs e)
         {
             OpenFileDialog of = new OpenFileDialog();
@@ -54,27 +56,9 @@ namespace outliner
             ApplySourceFile(files[0]);
         }
 
-        private void _enableContext_CheckedChanged(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)
         {
-            this._contextSize.Enabled = this._enableContext.Checked;
-            refresh();
-        }
-
-        //===========================
-
-        private void ApplySourceFile(string file_name)
-        {
-            button2.Text = Path.GetFileName(file_name);
-            button2.Tag = file_name;
-
-            try
-            {
-                _analyzed_content = _analyzer.analyze(File.ReadAllLines(file_name));
-                refresh();
-            }
-            catch (Exception ex) {
-                MessageBox.Show(ex.Message);
-            }
+            toggleSetting();
         }
 
         private void _expandLevel2_Click(object sender, EventArgs e)
@@ -113,6 +97,23 @@ namespace outliner
         private ContentRestructor _restructor = new ContentRestructor();
 
         //===========================
+
+        private void ApplySourceFile(string file_name)
+        {
+            button2.Text = Path.GetFileName(file_name);
+            button2.Tag = file_name;
+
+            try
+            {
+                _analyzed_content = _analyzer.analyze(File.ReadAllLines(file_name));
+                refresh();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
         private void execute(string command, Content content) {
             string[] elements = command.Split(new char[] {' '} , StringSplitOptions.RemoveEmptyEntries);
 
@@ -159,8 +160,6 @@ namespace outliner
         private void refresh()
         {
             _restructor.filter = new TextFilter(_key.Text);
-            _restructor.enableContextConstrain = _enableContext.Checked;
-            _restructor.contextSize = Decimal.ToInt32(_contextSize.Value);
 
             Content new_content = new Content();
             if (_restructor.filter.isValid())
@@ -181,10 +180,6 @@ namespace outliner
             _tree_view.add(new_content);
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            toggleSetting();
-        }
 
         private void toggleSetting()
         {

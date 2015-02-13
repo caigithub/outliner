@@ -19,30 +19,37 @@ namespace outliner
 
         public ScopeMatchResult getIndent(string s)
         {
-            int ScopeBeginCount = 0;
-            int ScopeEndCount = 0;
+            int indentInCount = 0;
+            int indentOutCount = 0;
 
             foreach (char c in s.ToCharArray())
             {
                 if (c == getScopeBegin())
                 {
-                    ScopeBeginCount++;
+                    indentInCount++;
                 }
 
                 if (c == getScopeEnd())
                 {
-                    if (ScopeBeginCount > 0)
+                    if (indentInCount > 0)
                     {
-                        ScopeBeginCount--;
+                        indentInCount--;
                     }
                     else
                     {
-                        ScopeEndCount--;
+                        indentOutCount--;
                     }
                 }
             }
 
-            return new ScopeMatchResult(ScopeEndCount, ScopeBeginCount);
+            if (indentOutCount < 0)
+            {
+                return new ScopeMatchResult(indentOutCount + 1, indentInCount - 1);
+            }
+            else
+            {
+                return new ScopeMatchResult(indentOutCount, indentInCount);
+            }
         }
     }
 }
